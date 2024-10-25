@@ -1,4 +1,6 @@
 ﻿using IT;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace UserSigning.Tests;
@@ -36,5 +38,11 @@ public class JsonTest
         json = "{\"Str\":\"\\u043C\\u043E\\u044F utf8 \\u0441\\u0442\\u0440\\u043E\\u043A\\u0430\",\"Utf8Str\":\"моя utf8 строка\"}";
 
         Assert.That(JsonSerializer.Deserialize<Entity>(json), Is.EqualTo(obj));
+    }
+
+    [Test]
+    public void SizeOfTest()
+    {
+        Assert.That(Unsafe.SizeOf<Utf8String>(), Is.EqualTo(16));
     }
 }

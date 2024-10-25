@@ -1,9 +1,8 @@
 ﻿using IT;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
-namespace UserSigning.Tests;
+namespace Tests;
 
 public class JsonTest
 {

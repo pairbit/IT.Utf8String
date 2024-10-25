@@ -116,17 +116,7 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
     public bool Equals(Utf8String other) => _value.Equals(other._value) ||
         _value.Span.SequenceEqual(other._value.Span);
 
-    public override string ToString()
-#if NETSTANDARD2_0
-    {
-        if (System.Runtime.InteropServices.MemoryMarshal.TryGetArray(_value, out var segment))
-            return Encoding.UTF8.GetString(segment.Array, segment.Offset, segment.Count);
-        else
-            return Encoding.UTF8.GetString(_value.Span);
-    }
-#else
-        => Encoding.UTF8.GetString(_value.Span);
-#endif
+    public override string ToString() => Encoding.UTF8.GetString(_value.Span);
 
     public override bool Equals(object? obj)
         => obj is Utf8String utf8String && Equals(utf8String);

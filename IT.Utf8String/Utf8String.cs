@@ -25,7 +25,7 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
     class Utf8StringTypeConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
-            => sourceType == typeof(Utf8String) || 
+            => sourceType == typeof(Utf8String) ||
                sourceType == typeof(string) ||
                sourceType == typeof(char[]) ||
                sourceType == typeof(Memory<char>) ||
@@ -172,7 +172,7 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
         return chars;
     }
 
-    public bool TryGetArray(out ArraySegment<byte> segment) 
+    public bool TryGetArray(out ArraySegment<byte> segment)
         => System.Runtime.InteropServices.MemoryMarshal.TryGetArray(_value, out segment);
 
     public static bool operator ==(Utf8String left, Utf8String right) => left.Equals(right);

@@ -5,6 +5,25 @@ namespace Tests;
 public class FormattableTest
 {
     [Test]
+    public void TryFormat_Test()
+    {
+        var utf8String = new Utf8String("моя строка"u8.ToArray());
+        Span<char> buffer = stackalloc char[100];
+
+        Assert.That(utf8String.TryFormat(buffer, out var written), Is.True);
+        Assert.That(buffer.Slice(0, written).SequenceEqual("моя строка".ToCharArray()), Is.True);
+
+        var start = written;
+        var str = "моя часть строки"u8.ToArray();
+        var sliced = str.AsMemory().Slice(7, 10);
+        utf8String = new Utf8String(sliced);
+        Assert.That(utf8String.ToString(), Is.EqualTo("часть"));
+        
+        Assert.That(utf8String.TryFormat(buffer.Slice(start), out written), Is.True);
+        Assert.That(buffer.Slice(start, written).SequenceEqual("часть".ToCharArray()), Is.True);
+    }
+
+    [Test]
     public void ISpanFormattable_Test()
     {
         var utf8str = new Utf8String("моя строка"u8.ToArray());

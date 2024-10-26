@@ -1,2 +1,2 @@
 # IT.Utf8String
-Wrapper over ReadOnlyMemory<byte>
+Wrapper over ReadOnlyMemory&lt;byte&gt;

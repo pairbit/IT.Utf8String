@@ -1,4 +1,6 @@
-﻿using System.Text.Unicode;
+﻿#if NET8_0_OR_GREATER
+
+using System.Text.Unicode;
 
 namespace Tests;
 
@@ -14,3 +16,5 @@ public class ValidateTest
         Assert.That(Utf8.IsValid("􏿿"u8), Is.True);
     }
 }
+
+#endif

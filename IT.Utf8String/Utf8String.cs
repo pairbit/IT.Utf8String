@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Buffers;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -8,7 +10,8 @@ using System.Text.Json.Serialization;
 namespace IT;
 
 [DebuggerDisplay("{ToString(),nq}")]
-[JsonConverter(typeof(JsonConverter))]
+[TypeConverter(typeof(Utf8StringTypeConverter))]
+[JsonConverter(typeof(Utf8StringJsonConverter))]
 public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
 #if NET6_0_OR_GREATER
 , ISpanFormattable
@@ -20,7 +23,33 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
 , IUtf8SpanFormattable, IUtf8SpanParsable<Utf8String>
 #endif
 {
-    public class JsonConverter : JsonConverter<Utf8String>
+    class Utf8StringTypeConverter : TypeConverter
+    {
+        public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
+            => sourceType == typeof(string) ||
+               sourceType == typeof(char[]) ||
+               sourceType == typeof(ReadOnlyMemory<char>) ||
+               sourceType == typeof(Memory<char>) ||
+               sourceType == typeof(byte[]) ||
+               sourceType == typeof(ReadOnlyMemory<byte>) ||
+               sourceType == typeof(Memory<byte>) ||
+               base.CanConvertFrom(context, sourceType);
+
+        public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
+        {
+            if (value is string str) return new Utf8String(Parse(str.AsSpan()));
+            if (value is char[] chars) return new Utf8String(Parse(chars));
+            if (value is ReadOnlyMemory<char> romChars) return new Utf8String(Parse(romChars.Span));
+            if (value is Memory<char> mChars) return new Utf8String(Parse(mChars.Span));
+            if (value is byte[] bytes) return new Utf8String(bytes);
+            if (value is ReadOnlyMemory<byte> romBytes) return new Utf8String(romBytes);
+            if (value is Memory<byte> mBytes) return new Utf8String(mBytes);
+
+            return base.ConvertFrom(context, culture, value);
+        }
+    }
+
+    class Utf8StringJsonConverter : JsonConverter<Utf8String>
     {
         public override Utf8String Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

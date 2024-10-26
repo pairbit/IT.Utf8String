@@ -26,24 +26,26 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
     class Utf8StringTypeConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
-            => sourceType == typeof(string) ||
+            => sourceType == typeof(Utf8String) || 
+               sourceType == typeof(string) ||
                sourceType == typeof(char[]) ||
-               sourceType == typeof(ReadOnlyMemory<char>) ||
                sourceType == typeof(Memory<char>) ||
+               sourceType == typeof(ReadOnlyMemory<char>) ||
                sourceType == typeof(byte[]) ||
-               sourceType == typeof(ReadOnlyMemory<byte>) ||
                sourceType == typeof(Memory<byte>) ||
+               sourceType == typeof(ReadOnlyMemory<byte>) ||
                base.CanConvertFrom(context, sourceType);
 
         public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
         {
+            if (value is Utf8String utf8String) return utf8String;
             if (value is string str) return new Utf8String(Parse(str.AsSpan()));
             if (value is char[] chars) return new Utf8String(Parse(chars));
-            if (value is ReadOnlyMemory<char> romChars) return new Utf8String(Parse(romChars.Span));
-            if (value is Memory<char> mChars) return new Utf8String(Parse(mChars.Span));
+            if (value is Memory<char> memoryChar) return new Utf8String(Parse(memoryChar.Span));
+            if (value is ReadOnlyMemory<char> readOnlyMemoryChar) return new Utf8String(Parse(readOnlyMemoryChar.Span));
             if (value is byte[] bytes) return new Utf8String(bytes);
-            if (value is ReadOnlyMemory<byte> romBytes) return new Utf8String(romBytes);
-            if (value is Memory<byte> mBytes) return new Utf8String(mBytes);
+            if (value is Memory<byte> memoryByte) return new Utf8String(memoryByte);
+            if (value is ReadOnlyMemory<byte> readOnlyMemoryByte) return new Utf8String(readOnlyMemoryByte);
 
             return base.ConvertFrom(context, culture, value);
         }

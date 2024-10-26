@@ -2,7 +2,6 @@
 using System.Buffers;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -36,7 +35,7 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
                sourceType == typeof(ReadOnlyMemory<byte>) ||
                base.CanConvertFrom(context, sourceType);
 
-        public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
+        public override object? ConvertFrom(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
         {
             if (value is Utf8String utf8String) return utf8String;
             if (value is string str) return new Utf8String(Parse(str.AsSpan()));
@@ -150,12 +149,30 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
     public bool Equals(Utf8String other) => _value.Equals(other._value) ||
         _value.Span.SequenceEqual(other._value.Span);
 
-    public override string ToString() => Encoding.UTF8.GetString(_value.Span);
-
     public override bool Equals(object? obj)
         => obj is Utf8String utf8String && Equals(utf8String);
 
     public override int GetHashCode() => _value.GetHashCode();
+
+    public override string ToString() => Encoding.UTF8.GetString(_value.Span);
+
+    public char[] ToChars()
+    {
+        var chars = new char[Encoding.UTF8.GetCharCount(_value.Span)];
+
+#if NET6_0_OR_GREATER
+        var status = System.Text.Unicode.Utf8.ToUtf16(_value.Span, chars, out _, out _);
+        if (status != OperationStatus.Done)
+            throw new InvalidOperationException($"OperationStatus is '{status}'");
+#else
+        Encoding.UTF8.GetChars(_value.Span, chars);
+#endif
+
+        return chars;
+    }
+
+    public bool TryGetArray(out ArraySegment<byte> segment) 
+        => System.Runtime.InteropServices.MemoryMarshal.TryGetArray(_value, out segment);
 
     public static bool operator ==(Utf8String left, Utf8String right) => left.Equals(right);
 

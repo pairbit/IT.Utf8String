@@ -18,7 +18,8 @@ public class FormattableTest
         var sliced = str.AsMemory().Slice(7, 10);
         utf8String = new Utf8String(sliced);
         Assert.That(utf8String.ToString(), Is.EqualTo("часть"));
-        
+        Assert.That(utf8String.ToChars(), Is.EqualTo("часть".ToCharArray()));
+
         Assert.That(utf8String.TryFormat(buffer.Slice(start), out written), Is.True);
         Assert.That(buffer.Slice(start, written).SequenceEqual("часть".ToCharArray()), Is.True);
     }

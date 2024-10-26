@@ -5,7 +5,7 @@ namespace Tests;
 public class ParsableTest
 {
     [Test]
-    public void ISpanFormattable_Test()
+    public void Parse_Test()
     {
         var chars = "моя строка".ToArray();
         var bytes = "моя строка"u8.ToArray();

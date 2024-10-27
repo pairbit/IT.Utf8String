@@ -27,6 +27,7 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
     {
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
             => sourceType == typeof(ReadOnlyUtf8String) ||
+               sourceType == typeof(Utf8String) ||
                sourceType == typeof(string) ||
                sourceType == typeof(char[]) ||
                sourceType == typeof(Memory<char>) ||
@@ -38,7 +39,8 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
 
         public override object? ConvertFrom(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
         {
-            if (value is ReadOnlyUtf8String utf8String) return utf8String;
+            if (value is ReadOnlyUtf8String readOnlyUtf8String) return readOnlyUtf8String;
+            if (value is Utf8String utf8String) return utf8String.AsReadOnly();
             if (value is string str) return new ReadOnlyUtf8String(Parse(str.AsSpan()));
             if (value is char[] chars) return new ReadOnlyUtf8String(Parse(chars));
             if (value is Memory<char> memoryChar) return new ReadOnlyUtf8String(Parse(memoryChar.Span));

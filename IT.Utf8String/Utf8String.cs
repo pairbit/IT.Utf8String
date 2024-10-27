@@ -27,6 +27,7 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
     {
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
             => sourceType == typeof(Utf8String) ||
+               sourceType == typeof(ReadOnlyUtf8String) ||
                sourceType == typeof(string) ||
                sourceType == typeof(char[]) ||
                sourceType == typeof(Memory<char>) ||
@@ -39,6 +40,7 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
         public override object? ConvertFrom(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
         {
             if (value is Utf8String utf8String) return utf8String;
+            if (value is ReadOnlyUtf8String readOnlyUtf8String) return new Utf8String(readOnlyUtf8String.Memory.ToArray());
             if (value is string str) return new Utf8String(Parse(str.AsSpan()));
             if (value is char[] chars) return new Utf8String(Parse(chars));
             if (value is Memory<char> memoryChar) return new Utf8String(Parse(memoryChar.Span));

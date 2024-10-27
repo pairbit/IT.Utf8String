@@ -30,6 +30,9 @@ public class FormattableTest
         var utf8str = new Utf8String("моя строка"u8.ToArray());
         
         Assert.That($"Format '{utf8str}' str", Is.EqualTo("Format 'моя строка' str"));
+
+        utf8str = Utf8String.Empty;
+        Assert.That($"Format '{utf8str}' str", Is.EqualTo("Format '' str"));
     }
 
 #if NET8_0_OR_GREATER

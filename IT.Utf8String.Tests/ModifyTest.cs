@@ -1,12 +1,19 @@
 ﻿using IT;
 using System.Buffers;
 using System.Buffers.Text;
-using System.Net.NetworkInformation;
 
 namespace Tests;
 
 public class ModifyTest
 {
+    [Test]
+    public void EmptyTest()
+    {
+        Assert.That(Utf8String.Empty.ToString(), Is.EqualTo(""));
+        Assert.That(Utf8String.Empty.ToString(), Is.EqualTo(string.Empty));
+        Assert.That(ReferenceEquals(Utf8String.Empty.ToString(), string.Empty), Is.True);
+    }
+
     [Test]
     public void Change_Test()
     {

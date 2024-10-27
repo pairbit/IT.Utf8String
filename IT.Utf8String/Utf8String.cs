@@ -9,7 +9,7 @@ using System.Text.Json.Serialization;
 
 namespace IT;
 
-[DebuggerDisplay("{ToString(),nq}")]
+[DebuggerDisplay("{ToString()}")]
 [TypeConverter(typeof(Utf8StringTypeConverter))]
 [JsonConverter(typeof(Utf8StringJsonConverter))]
 public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable

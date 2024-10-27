@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -73,9 +74,15 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
 
     private readonly Memory<byte> _value;
 
+    public static Utf8String Empty => default;
+
     public Memory<byte> Memory => _value;
 
     public Span<byte> Span => _value.Span;
+
+    public int Length => _value.Length;
+
+    public bool IsEmpty => _value.Length == 0;
 
     public Utf8String(Memory<byte> value)
     {
@@ -174,6 +181,12 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
 
     public bool TryGetArray(out ArraySegment<byte> segment)
         => System.Runtime.InteropServices.MemoryMarshal.TryGetArray(_value, out segment);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Utf8String Slice(int start) => new(Memory.Slice(start));
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Utf8String Slice(int start, int length) => new(Memory.Slice(start, length));
 
     public static bool operator ==(Utf8String left, Utf8String right) => left.Equals(right);
 

@@ -1,2 +1,2 @@
 # IT.Utf8String
-Wrapper over ReadOnlyMemory&lt;byte&gt;
+Utf8String and ReadOnlyUtf8String types

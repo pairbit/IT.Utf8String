@@ -44,7 +44,7 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
             if (value is ReadOnlyMemory<char> readOnlyMemoryChar) return new Utf8String(Parse(readOnlyMemoryChar.Span));
             if (value is byte[] bytes) return new Utf8String(bytes);
             if (value is Memory<byte> memoryByte) return new Utf8String(memoryByte);
-            if (value is ReadOnlyMemory<byte> readOnlyMemoryByte) return new Utf8String(readOnlyMemoryByte);
+            if (value is ReadOnlyMemory<byte> readOnlyMemoryByte) return new Utf8String(readOnlyMemoryByte.ToArray());
 
             return base.ConvertFrom(context, culture, value);
         }
@@ -71,13 +71,13 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
             => writer.WriteStringValue(value);
     }
 
-    private readonly ReadOnlyMemory<byte> _value;
+    private readonly Memory<byte> _value;
 
-    public ReadOnlyMemory<byte> Memory => _value;
+    public Memory<byte> Memory => _value;
 
-    public ReadOnlySpan<byte> Span => _value.Span;
+    public Span<byte> Span => _value.Span;
 
-    public Utf8String(ReadOnlyMemory<byte> value)
+    public Utf8String(Memory<byte> value)
     {
         _value = value;
     }
@@ -179,11 +179,15 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
 
     public static bool operator !=(Utf8String left, Utf8String right) => !left.Equals(right);
 
+    public static implicit operator Memory<byte>(Utf8String value) => value._value;
+
+    public static implicit operator Span<byte>(Utf8String value) => value._value.Span;
+
     public static implicit operator ReadOnlyMemory<byte>(Utf8String value) => value._value;
 
     public static implicit operator ReadOnlySpan<byte>(Utf8String value) => value._value.Span;
 
-    public static implicit operator Utf8String(ReadOnlyMemory<byte> value) => new(value);
+    public static implicit operator Utf8String(Memory<byte> value) => new(value);
 
     public static implicit operator Utf8String(byte[] value) => new(value);
 

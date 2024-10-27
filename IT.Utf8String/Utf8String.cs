@@ -120,6 +120,11 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
 
     public bool TryFormat(Span<char> chars, out int written)
     {
+        if (_value.Length == 0)
+        {
+            written = 0;
+            return true;
+        }
         //TODO: chars length != bytes length
         if (chars.Length < _value.Length)
         {
@@ -143,6 +148,11 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
 
     public bool TryFormat(Span<byte> bytes, out int written)
     {
+        if (_value.Length == 0)
+        {
+            written = 0;
+            return true;
+        }
         if (bytes.Length < _value.Length)
         {
             written = 0;

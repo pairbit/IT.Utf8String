@@ -22,6 +22,9 @@ public class FormattableTest
 
         Assert.That(utf8String.TryFormat(buffer.Slice(start), out written), Is.True);
         Assert.That(buffer.Slice(start, written).SequenceEqual("часть".ToCharArray()), Is.True);
+
+        Assert.That(Utf8String.Empty.TryFormat(buffer, out written), Is.True);
+        Assert.That(written, Is.EqualTo(0));
     }
 
     [Test]

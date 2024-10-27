@@ -162,11 +162,14 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
 
     public override int GetHashCode() => _value.GetHashCode();
 
-    public override string ToString() => Encoding.UTF8.GetString(_value.Span);
+    public override string ToString() => _value.Length == 0 ? string.Empty : Encoding.UTF8.GetString(_value.Span);
 
     public char[] ToChars()
     {
-        var chars = new char[Encoding.UTF8.GetCharCount(_value.Span)];
+        var count = Encoding.UTF8.GetCharCount(_value.Span);
+        if (count == 0) return [];
+
+        var chars = new char[count];
 
 #if NET6_0_OR_GREATER
         var status = System.Text.Unicode.Utf8.ToUtf16(_value.Span, chars, out _, out _);
@@ -181,10 +184,10 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
 
     public bool TryGetArray(out ArraySegment<byte> segment)
         => System.Runtime.InteropServices.MemoryMarshal.TryGetArray(_value, out segment);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Utf8String Slice(int start) => new(Memory.Slice(start));
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Utf8String Slice(int start, int length) => new(Memory.Slice(start, length));
 
@@ -215,7 +218,10 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
     /// <exception cref="ArgumentException"></exception>
     public static Utf8String Parse(ReadOnlySpan<char> chars)
     {
-        var bytes = new byte[Encoding.UTF8.GetByteCount(chars)];
+        var count = Encoding.UTF8.GetByteCount(chars);
+        if (count == 0) return default;
+
+        var bytes = new byte[count];
 #if NET6_0_OR_GREATER
         var status = System.Text.Unicode.Utf8.FromUtf16(chars, bytes, out _, out _);
 
@@ -228,7 +234,14 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
 
     public static bool TryParse(ReadOnlySpan<char> chars, out Utf8String utf8String)
     {
-        var bytes = new byte[Encoding.UTF8.GetByteCount(chars)];
+        var count = Encoding.UTF8.GetByteCount(chars);
+        if (count == 0)
+        {
+            utf8String = default;
+            return true;
+        }
+
+        var bytes = new byte[count];
 #if NET6_0_OR_GREATER
         var status = System.Text.Unicode.Utf8.FromUtf16(chars, bytes, out _, out _);
 

@@ -76,7 +76,7 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
 
     private readonly ReadOnlyMemory<byte> _value;
 
-    public static Utf8String Empty => default;
+    public static ReadOnlyUtf8String Empty => default;
 
     public ReadOnlyMemory<byte> Memory => _value;
 

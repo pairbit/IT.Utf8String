@@ -16,4 +16,17 @@ public class ParsableTest
 
         Assert.That(Utf8String.Parse(chars.AsSpan().Slice(4, 3)), Is.EqualTo(new Utf8String("стр"u8.ToArray())));
     }
+
+    [Test]
+    public void RO_Parse_Test()
+    {
+        var chars = "моя строка".ToArray();
+        var bytes = "моя строка"u8.ToArray();
+
+        Assert.That(ReadOnlyUtf8String.Parse(chars), Is.EqualTo(new ReadOnlyUtf8String(bytes)));
+        Assert.That(ReadOnlyUtf8String.TryParse(chars, out var utf8String), Is.True);
+        Assert.That(utf8String, Is.EqualTo(new ReadOnlyUtf8String(bytes)));
+
+        Assert.That(ReadOnlyUtf8String.Parse(chars.AsSpan().Slice(4, 3)), Is.EqualTo(new ReadOnlyUtf8String("стр"u8.ToArray())));
+    }
 }

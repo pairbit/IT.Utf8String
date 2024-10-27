@@ -12,6 +12,10 @@ public class ModifyTest
         Assert.That(Utf8String.Empty.ToString(), Is.EqualTo(""));
         Assert.That(Utf8String.Empty.ToString(), Is.EqualTo(string.Empty));
         Assert.That(ReferenceEquals(Utf8String.Empty.ToString(), string.Empty), Is.True);
+
+        Assert.That(ReadOnlyUtf8String.Empty.ToString(), Is.EqualTo(""));
+        Assert.That(ReadOnlyUtf8String.Empty.ToString(), Is.EqualTo(string.Empty));
+        Assert.That(ReferenceEquals(ReadOnlyUtf8String.Empty.ToString(), string.Empty), Is.True);
     }
 
     [Test]

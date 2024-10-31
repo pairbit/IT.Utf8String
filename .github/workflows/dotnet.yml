@@ -45,3 +45,9 @@ jobs:
             PROJECT_FILE_PATH: IT.Utf8String/IT.Utf8String.csproj
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: true
+
+      - name: Publish IT.Utf8String.MessagePack
+        uses: pairbit/publish-nuget@v2.6.1
+        with:
+            PROJECT_FILE_PATH: IT.Utf8String.MessagePack/IT.Utf8String.MessagePack.csproj
+            NUGET_KEY: ${{secrets.NUGET}}

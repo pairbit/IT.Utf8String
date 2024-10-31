@@ -1,6 +1,6 @@
-﻿using MemoryPack;
+﻿using IT;
 
-namespace IT.MemoryPack.Formatters;
+namespace MemoryPack.Formatters;
 
 public sealed class ReadOnlyUtf8StringMemoryPackFormatter : MemoryPackFormatter<ReadOnlyUtf8String>
 {

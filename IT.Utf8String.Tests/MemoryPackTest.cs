@@ -1,8 +1,8 @@
 ﻿#if NET6_0_OR_GREATER
 
 using IT;
-using IT.MemoryPack.Formatters;
 using MemoryPack;
+using MemoryPack.Formatters;
 
 namespace Tests;
 

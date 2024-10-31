@@ -2,27 +2,40 @@
 
 using IT;
 using MemoryPack;
+using MemoryPack.Formatters;
 using System.Buffers;
 using System.Runtime.InteropServices;
 
 namespace Tests;
 
 [MemoryPackable]
-public partial class Strs : IDisposable, IEquatable<Strs>
+public partial record Strs
 {
-    private bool _usePool;
-
     static partial void StaticConstructor()
     {
-        //if (!MemoryPackFormatterProvider.IsRegistered<Utf8String>())
-        //{
-        //    MemoryPackFormatterProvider.Register(Utf8StringMemoryPackFormatter.Default);
-        //}
-        //if (!MemoryPackFormatterProvider.IsRegistered<ReadOnlyUtf8String>())
-        //{
-        //    MemoryPackFormatterProvider.Register(ReadOnlyUtf8StringMemoryPackFormatter.Default);
-        //}
+        if (!MemoryPackFormatterProvider.IsRegistered<Utf8String>())
+        {
+            MemoryPackFormatterProvider.Register(Utf8StringMemoryPackFormatter.Default);
+        }
+        if (!MemoryPackFormatterProvider.IsRegistered<ReadOnlyUtf8String>())
+        {
+            MemoryPackFormatterProvider.Register(ReadOnlyUtf8StringMemoryPackFormatter.Default);
+        }
     }
+
+    public string Str { get; set; } = null!;
+
+    [MemoryPackAllowSerialize]
+    public Utf8String Utf8Str { get; set; }
+
+    [MemoryPackAllowSerialize]
+    public ReadOnlyUtf8String ROUtf8Str { get; set; }
+}
+
+[MemoryPackable]
+public partial class StrsPool : IDisposable, IEquatable<StrsPool>
+{
+    private bool _usePool;
 
     public string Str { get; set; } = null!;
 
@@ -59,13 +72,13 @@ public partial class Strs : IDisposable, IEquatable<Strs>
         }
     }
 
-    public bool Equals(Strs? other) => other != null && 
+    public bool Equals(StrsPool? other) => other != null && 
         Str.Equals(other.Str) &&
         Utf8Str.Equals(other.Utf8Str) &&
         ROUtf8Str.Equals(other.ROUtf8Str);
 
     public override bool Equals(object? obj)
-        => obj is Strs strs && Equals(strs);
+        => obj is StrsPool strs && Equals(strs);
 
     public override int GetHashCode()
     {
@@ -76,9 +89,9 @@ public partial class Strs : IDisposable, IEquatable<Strs>
 public class MemoryPackTest
 {
     [Test]
-    public void PackTest()
+    public void StrsTest()
     {
-        using var s = new Strs
+        var s = new Strs
         {
             Str = "Str",
             Utf8Str = "Utf8Str"u8.ToArray(),
@@ -87,7 +100,24 @@ public class MemoryPackTest
 
         var bytes = MemoryPackSerializer.Serialize(s);
 
-        using var s2 = MemoryPackSerializer.Deserialize<Strs>(bytes);
+        var s2 = MemoryPackSerializer.Deserialize<Strs>(bytes);
+
+        Assert.That(s, Is.EqualTo(s2));
+    }
+
+    [Test]
+    public void StrsPoolTest()
+    {
+        using var s = new StrsPool
+        {
+            Str = "StrPool",
+            Utf8Str = "Utf8StrPool"u8.ToArray(),
+            ROUtf8Str = "ROUtf8StrPool"u8.ToArray()
+        };
+
+        var bytes = MemoryPackSerializer.Serialize(s);
+
+        using var s2 = MemoryPackSerializer.Deserialize<StrsPool>(bytes);
 
         Assert.That(s, Is.EqualTo(s2));
     }

@@ -51,3 +51,4 @@ jobs:
         with:
             PROJECT_FILE_PATH: IT.Utf8String.MemoryPack/IT.Utf8String.MemoryPack.csproj
             NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: true

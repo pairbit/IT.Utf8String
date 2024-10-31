@@ -5,7 +5,9 @@ VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Utf8String", "IT.Utf8String\IT.Utf8String.csproj", "{1EAF34B4-7046-4CC2-A2BF-7C7D4701C8AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IT.Utf8String.Tests", "IT.Utf8String.Tests\IT.Utf8String.Tests.csproj", "{34D05670-2566-4CEC-86C1-332AA077D284}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Utf8String.Tests", "IT.Utf8String.Tests\IT.Utf8String.Tests.csproj", "{34D05670-2566-4CEC-86C1-332AA077D284}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IT.Utf8String.MemoryPack", "IT.Utf8String.MemoryPack\IT.Utf8String.MemoryPack.csproj", "{658D8DE2-4717-4A78-AAFC-D66540D13815}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{34D05670-2566-4CEC-86C1-332AA077D284}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34D05670-2566-4CEC-86C1-332AA077D284}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34D05670-2566-4CEC-86C1-332AA077D284}.Release|Any CPU.Build.0 = Release|Any CPU
+		{658D8DE2-4717-4A78-AAFC-D66540D13815}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{658D8DE2-4717-4A78-AAFC-D66540D13815}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{658D8DE2-4717-4A78-AAFC-D66540D13815}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{658D8DE2-4717-4A78-AAFC-D66540D13815}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
 	<TargetFrameworks>net462;net6.0;net8.0</TargetFrameworks>
@@ -22,6 +22,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework) != 'net462'">
+    <ProjectReference Include="..\IT.Utf8String.MemoryPack\IT.Utf8String.MemoryPack.csproj" />
+	<PackageReference Include="MemoryPack" Version="1.21.3" />
   </ItemGroup>
 
   <ItemGroup>

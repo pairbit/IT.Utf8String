@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Utf8String", "IT.Utf8Str
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Utf8String.Tests", "IT.Utf8String.Tests\IT.Utf8String.Tests.csproj", "{34D05670-2566-4CEC-86C1-332AA077D284}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IT.Utf8String.MemoryPack", "IT.Utf8String.MemoryPack\IT.Utf8String.MemoryPack.csproj", "{658D8DE2-4717-4A78-AAFC-D66540D13815}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IT.Utf8String.MemoryPack", "IT.Utf8String.MemoryPack\IT.Utf8String.MemoryPack.csproj", "{658D8DE2-4717-4A78-AAFC-D66540D13815}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IT.Utf8String.AspNetCore", "IT.Utf8String.AspNetCore\IT.Utf8String.AspNetCore.csproj", "{AB5E5FE5-9535-4D98-B423-D1F7DD6B47F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{658D8DE2-4717-4A78-AAFC-D66540D13815}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{658D8DE2-4717-4A78-AAFC-D66540D13815}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{658D8DE2-4717-4A78-AAFC-D66540D13815}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB5E5FE5-9535-4D98-B423-D1F7DD6B47F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB5E5FE5-9535-4D98-B423-D1F7DD6B47F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB5E5FE5-9535-4D98-B423-D1F7DD6B47F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB5E5FE5-9535-4D98-B423-D1F7DD6B47F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

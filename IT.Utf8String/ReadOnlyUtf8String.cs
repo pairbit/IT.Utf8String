@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Buffers;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -59,15 +58,11 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
         {
             if (reader.TokenType != JsonTokenType.String) throw new JsonException("Expected string");
 
-            if (reader.HasValueSequence)
-            {
-                var sequence = reader.ValueSequence;
-                return sequence.IsSingleSegment ? sequence.First.Span.ToArray() : sequence.ToArray();
-            }
-            else
-            {
-                return reader.ValueSpan.ToArray();
-            }
+            var bytes = new byte[reader.HasValueSequence ? reader.ValueSequence.Length : reader.ValueSpan.Length];
+
+            var written = reader.CopyString(bytes);
+
+            return bytes.AsMemory(0, written);
         }
 
         public override void Write(Utf8JsonWriter writer, ReadOnlyUtf8String value, JsonSerializerOptions options)
@@ -136,9 +131,9 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
 
 #if NET6_0_OR_GREATER
         var status = System.Text.Unicode.Utf8.ToUtf16(_value.Span, chars, out _, out written);
-        if (status != OperationStatus.Done)
+        if (status != System.Buffers.OperationStatus.Done)
         {
-            if (status == OperationStatus.DestinationTooSmall) return false;
+            if (status == System.Buffers.OperationStatus.DestinationTooSmall) return false;
             throw new InvalidOperationException($"OperationStatus is '{status}'");
         }
 #else
@@ -185,7 +180,7 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
 
 #if NET6_0_OR_GREATER
         var status = System.Text.Unicode.Utf8.ToUtf16(_value.Span, chars, out _, out _);
-        if (status != OperationStatus.Done)
+        if (status != System.Buffers.OperationStatus.Done)
             throw new InvalidOperationException($"OperationStatus is '{status}'");
 #else
         Encoding.UTF8.GetChars(_value.Span, chars);
@@ -235,7 +230,7 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
 #if NET6_0_OR_GREATER
         var status = System.Text.Unicode.Utf8.FromUtf16(chars, bytes, out _, out _);
 
-        if (status != OperationStatus.Done) throw new ArgumentException($"OperationStatus is '{status}'", nameof(chars));
+        if (status != System.Buffers.OperationStatus.Done) throw new ArgumentException($"OperationStatus is '{status}'", nameof(chars));
 #else
         Encoding.UTF8.GetBytes(chars, bytes);
 #endif
@@ -255,7 +250,7 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
 #if NET6_0_OR_GREATER
         var status = System.Text.Unicode.Utf8.FromUtf16(chars, bytes, out _, out _);
 
-        if (status != OperationStatus.Done)
+        if (status != System.Buffers.OperationStatus.Done)
         {
             utf8String = default;
             return false;

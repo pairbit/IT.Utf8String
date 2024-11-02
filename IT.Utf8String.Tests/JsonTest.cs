@@ -14,6 +14,55 @@ public class JsonTest
     }
 
     [Test]
+    public void BaseTest()
+    {
+        Assert.That(JsonSerializer.Serialize("my utf8 str"),
+            Is.EqualTo("\"my utf8 str\""));
+
+        Assert.That(JsonSerializer.Serialize(new Utf8String("my utf8 str"u8.ToArray())),
+            Is.EqualTo("\"my utf8 str\""));
+
+        Assert.That(JsonSerializer.Deserialize<string>("\"my utf8 str\""),
+            Is.EqualTo("my utf8 str"));
+
+        Assert.That(JsonSerializer.Deserialize<Utf8String>("\"my utf8 str\""),
+            Is.EqualTo(new Utf8String("my utf8 str"u8.ToArray())));
+    }
+
+    [Test]
+    public void BaseEscapedTest()
+    {
+        Assert.That(JsonSerializer.Serialize("my \"utf8\" str"),
+            Is.EqualTo("\"my \\u0022utf8\\u0022 str\""));
+
+        Assert.That(JsonSerializer.Serialize(new Utf8String("my \"utf8\" str"u8.ToArray())),
+            Is.EqualTo("\"my \\u0022utf8\\u0022 str\""));
+
+        Assert.That(JsonSerializer.Deserialize<string>("\"my \\u0022utf8\\u0022 str\""),
+            Is.EqualTo("my \"utf8\" str"));
+
+        Assert.That(JsonSerializer.Deserialize<Utf8String>("\"my \\u0022utf8\\u0022 str\""),
+            Is.EqualTo(new Utf8String("my \"utf8\" str"u8.ToArray())));
+
+        Assert.That(JsonSerializer.Deserialize<string>("\"my \\\"utf8\\\" str\""),
+            Is.EqualTo("my \"utf8\" str"));
+
+        Assert.That(JsonSerializer.Deserialize<Utf8String>("\"my \\\"utf8\\\" str\""),
+            Is.EqualTo(new Utf8String("my \"utf8\" str"u8.ToArray())));
+
+        var jso = new JsonSerializerOptions
+        {
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+
+        Assert.That(JsonSerializer.Serialize("my \"utf8\" str", jso), 
+            Is.EqualTo("\"my \\\"utf8\\\" str\""));
+
+        Assert.That(JsonSerializer.Serialize(new Utf8String("my \"utf8\" str"u8.ToArray()), jso), 
+            Is.EqualTo("\"my \\\"utf8\\\" str\""));
+    }
+
+    [Test]
     public void SerializeTest()
     {
         var obj = new Entity() { Str = "my utf8 str", Utf8Str = "my utf8 str"u8.ToArray() };
@@ -32,7 +81,7 @@ public class JsonTest
         json = JsonSerializer.Serialize(obj);
 
         Assert.That(json, Is.EqualTo("{\"Str\":\"\\u043C\\u043E\\u044F utf8 \\u0441\\u0442\\u0440\\u043E\\u043A\\u0430\",\"Utf8Str\":\"\\u043C\\u043E\\u044F utf8 \\u0441\\u0442\\u0440\\u043E\\u043A\\u0430\"}"));
-        Assert.That(JsonSerializer.Deserialize<Entity>(json), Is.Not.EqualTo(obj));
+        Assert.That(JsonSerializer.Deserialize<Entity>(json), Is.EqualTo(obj));
 
         json = "{\"Str\":\"\\u043C\\u043E\\u044F utf8 \\u0441\\u0442\\u0440\\u043E\\u043A\\u0430\",\"Utf8Str\":\"моя utf8 строка\"}";
 
@@ -65,7 +114,7 @@ public class JsonTest
         json = JsonSerializer.Serialize(obj);
 
         Assert.That(json, Is.EqualTo("{\"Str\":\"\\u043C\\u043E\\u044F utf8 \\u0441\\u0442\\u0440\\u043E\\u043A\\u0430\",\"Utf8Str\":\"\\u043C\\u043E\\u044F utf8 \\u0441\\u0442\\u0440\\u043E\\u043A\\u0430\"}"));
-        Assert.That(JsonSerializer.Deserialize<ROEntity>(json), Is.Not.EqualTo(obj));
+        Assert.That(JsonSerializer.Deserialize<ROEntity>(json), Is.EqualTo(obj));
 
         json = "{\"Str\":\"\\u043C\\u043E\\u044F utf8 \\u0441\\u0442\\u0440\\u043E\\u043A\\u0430\",\"Utf8Str\":\"моя utf8 строка\"}";
 

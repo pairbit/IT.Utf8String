@@ -89,6 +89,25 @@ public partial class StrsPool : IDisposable, IEquatable<StrsPool>
 public class MemoryPackTest
 {
     [Test]
+    public void BaseTest()
+    {
+        var str = "string";
+        var utf8Str = new Utf8String("string"u8.ToArray());
+
+        var str16Bytes = MemoryPackSerializer.Serialize(str, MemoryPackSerializerOptions.Utf16);
+        Assert.That(str16Bytes.Length, Is.EqualTo(16));
+
+        var strBytes = MemoryPackSerializer.Serialize(str, MemoryPackSerializerOptions.Utf8);
+        Assert.That(strBytes.Length, Is.EqualTo(14));
+
+        MemoryPackFormatterProvider.Register(Utf8StringMemoryPackFormatter.Default);
+        var utf8StrBytes = MemoryPackSerializer.Serialize(utf8Str);
+        Assert.That(utf8StrBytes.Length, Is.EqualTo(10));
+
+        Assert.That(strBytes[4..].SequenceEqual(utf8StrBytes), Is.True);
+    }
+
+    [Test]
     public void StrsTest()
     {
         var s = new Strs

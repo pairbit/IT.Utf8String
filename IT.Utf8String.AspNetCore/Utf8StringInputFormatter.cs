@@ -6,7 +6,7 @@ public class Utf8StringInputFormatter : InputFormatter
 {
     public Utf8StringInputFormatter()
     {
-        SupportedMediaTypes.Add(Utf8StringMediaType.TextPlainUtf8);
+        SupportedMediaTypes.Add(Net.Http.Headers.Utf8StringMediaTypeHeaderValue.TextPlainUtf8);
     }
 
     public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context)

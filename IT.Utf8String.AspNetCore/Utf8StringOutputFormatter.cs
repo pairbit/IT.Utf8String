@@ -7,7 +7,7 @@ public class Utf8StringOutputFormatter : OutputFormatter
 {
     public Utf8StringOutputFormatter()
     {
-        SupportedMediaTypes.Add(Utf8StringMediaType.TextPlainUtf8);
+        SupportedMediaTypes.Add(Net.Http.Headers.Utf8StringMediaTypeHeaderValue.TextPlainUtf8);
     }
 
     public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)

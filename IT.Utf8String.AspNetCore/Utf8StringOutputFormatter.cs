@@ -23,11 +23,13 @@ public class Utf8StringOutputFormatter : OutputFormatter
 
         if (obj is Utf8String utf8String)
         {
-            writer.Write(utf8String.Span);
+            if (utf8String.Length > 0)
+                writer.Write(utf8String.Span);
         }
         else if (obj is ReadOnlyUtf8String readOnlyUtf8String)
         {
-            writer.Write(readOnlyUtf8String.Span);
+            if (readOnlyUtf8String.Length > 0)
+                writer.Write(readOnlyUtf8String.Span);
         }
         else
         {

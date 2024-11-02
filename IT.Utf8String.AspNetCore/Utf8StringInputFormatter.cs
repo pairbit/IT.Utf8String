@@ -1,15 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.Net.Http.Headers;
 
 namespace IT.AspNetCore.Mvc.Formatters;
 
 public class Utf8StringInputFormatter : InputFormatter
 {
-    private static readonly MediaTypeHeaderValue _mediaType = new("text/plain") { Charset = "utf-8" };
-
     public Utf8StringInputFormatter()
     {
-        SupportedMediaTypes.Add(_mediaType);
+        SupportedMediaTypes.Add(Utf8StringMediaType.TextPlainUtf8);
     }
 
     protected override bool CanReadType(Type type) => type == typeof(Utf8String) || type == typeof(ReadOnlyUtf8String);

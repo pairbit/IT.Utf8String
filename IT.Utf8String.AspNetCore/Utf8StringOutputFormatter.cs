@@ -1,16 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.Net.Http.Headers;
 using System.Buffers;
 
 namespace IT.AspNetCore.Mvc.Formatters;
 
 public class Utf8StringOutputFormatter : OutputFormatter
 {
-    private static readonly MediaTypeHeaderValue _mediaType = new("text/plain") { Charset = "utf-8" };
-
     public Utf8StringOutputFormatter()
     {
-        SupportedMediaTypes.Add(_mediaType);
+        SupportedMediaTypes.Add(Utf8StringMediaType.TextPlainUtf8);
     }
 
     protected override bool CanWriteType(Type? type) => type == typeof(Utf8String) || type == typeof(ReadOnlyUtf8String);

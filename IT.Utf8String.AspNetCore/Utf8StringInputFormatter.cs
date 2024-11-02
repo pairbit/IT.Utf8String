@@ -11,6 +11,8 @@ public class Utf8StringInputFormatter : InputFormatter
 
     public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context)
     {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
         var request = context.HttpContext.Request;
 
         var length = request.ContentLength ?? throw new InvalidOperationException("ContentLength is null");
@@ -37,6 +39,8 @@ public class Utf8StringInputFormatter : InputFormatter
 
     protected override object? GetDefaultValueForType(Type modelType)
     {
+        if (modelType == null) throw new ArgumentNullException(nameof(modelType));
+
         if (modelType == typeof(Utf8String)) return Utf8String.Empty;
         if (modelType == typeof(ReadOnlyUtf8String)) return ReadOnlyUtf8String.Empty;
 

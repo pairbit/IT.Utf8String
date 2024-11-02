@@ -12,6 +12,8 @@ public class Utf8StringOutputFormatter : OutputFormatter
 
     public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
     {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
         var obj = context.Object;
 
         var writer = context.HttpContext.Response.BodyWriter;

@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Formatters;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace IT.AspNetCore.Mvc.Formatters;
 

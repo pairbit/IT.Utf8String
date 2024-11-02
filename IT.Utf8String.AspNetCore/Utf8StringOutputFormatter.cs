@@ -10,8 +10,6 @@ public class Utf8StringOutputFormatter : OutputFormatter
         SupportedMediaTypes.Add(Utf8StringMediaType.TextPlainUtf8);
     }
 
-    protected override bool CanWriteType(Type? type) => type == typeof(Utf8String) || type == typeof(ReadOnlyUtf8String);
-
     public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context)
     {
         var obj = context.Object;
@@ -35,4 +33,6 @@ public class Utf8StringOutputFormatter : OutputFormatter
 
         return writer.FlushAsync().AsTask();
     }
+
+    protected override bool CanWriteType(Type? type) => type == typeof(Utf8String) || type == typeof(ReadOnlyUtf8String);
 }

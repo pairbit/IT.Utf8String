@@ -52,3 +52,10 @@ jobs:
             PROJECT_FILE_PATH: IT.Utf8String.MemoryPack/IT.Utf8String.MemoryPack.csproj
             NUGET_KEY: ${{secrets.NUGET}}
             TAG_COMMIT: true
+            
+      - name: Publish IT.Utf8String.AspNetCore
+        uses: pairbit/publish-nuget@v2.6.1
+        with:
+            PROJECT_FILE_PATH: IT.Utf8String.AspNetCore/IT.Utf8String.AspNetCore.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: true

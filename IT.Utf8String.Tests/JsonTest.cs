@@ -22,11 +22,17 @@ public class JsonTest
         Assert.That(JsonSerializer.Serialize(new Utf8String("my utf8 str"u8.ToArray())),
             Is.EqualTo("\"my utf8 str\""));
 
+        Assert.That(JsonSerializer.Serialize(new ReadOnlyUtf8String("my utf8 str"u8.ToArray())),
+            Is.EqualTo("\"my utf8 str\""));
+
         Assert.That(JsonSerializer.Deserialize<string>("\"my utf8 str\""),
             Is.EqualTo("my utf8 str"));
 
         Assert.That(JsonSerializer.Deserialize<Utf8String>("\"my utf8 str\""),
             Is.EqualTo(new Utf8String("my utf8 str"u8.ToArray())));
+
+        Assert.That(JsonSerializer.Deserialize<ReadOnlyUtf8String>("\"my utf8 str\""),
+            Is.EqualTo(new ReadOnlyUtf8String("my utf8 str"u8.ToArray())));
     }
 
     [Test]
@@ -38,17 +44,26 @@ public class JsonTest
         Assert.That(JsonSerializer.Serialize(new Utf8String("my \"utf8\" str"u8.ToArray())),
             Is.EqualTo("\"my \\u0022utf8\\u0022 str\""));
 
+        Assert.That(JsonSerializer.Serialize(new ReadOnlyUtf8String("my \"utf8\" str"u8.ToArray())),
+            Is.EqualTo("\"my \\u0022utf8\\u0022 str\""));
+
         Assert.That(JsonSerializer.Deserialize<string>("\"my \\u0022utf8\\u0022 str\""),
             Is.EqualTo("my \"utf8\" str"));
 
         Assert.That(JsonSerializer.Deserialize<Utf8String>("\"my \\u0022utf8\\u0022 str\""),
             Is.EqualTo(new Utf8String("my \"utf8\" str"u8.ToArray())));
 
+        Assert.That(JsonSerializer.Deserialize<ReadOnlyUtf8String>("\"my \\u0022utf8\\u0022 str\""),
+            Is.EqualTo(new ReadOnlyUtf8String("my \"utf8\" str"u8.ToArray())));
+
         Assert.That(JsonSerializer.Deserialize<string>("\"my \\\"utf8\\\" str\""),
             Is.EqualTo("my \"utf8\" str"));
 
         Assert.That(JsonSerializer.Deserialize<Utf8String>("\"my \\\"utf8\\\" str\""),
             Is.EqualTo(new Utf8String("my \"utf8\" str"u8.ToArray())));
+
+        Assert.That(JsonSerializer.Deserialize<ReadOnlyUtf8String>("\"my \\\"utf8\\\" str\""),
+            Is.EqualTo(new ReadOnlyUtf8String("my \"utf8\" str"u8.ToArray())));
 
         var jso = new JsonSerializerOptions
         {
@@ -59,6 +74,9 @@ public class JsonTest
             Is.EqualTo("\"my \\\"utf8\\\" str\""));
 
         Assert.That(JsonSerializer.Serialize(new Utf8String("my \"utf8\" str"u8.ToArray()), jso), 
+            Is.EqualTo("\"my \\\"utf8\\\" str\""));
+
+        Assert.That(JsonSerializer.Serialize(new ReadOnlyUtf8String("my \"utf8\" str"u8.ToArray()), jso),
             Is.EqualTo("\"my \\\"utf8\\\" str\""));
     }
 

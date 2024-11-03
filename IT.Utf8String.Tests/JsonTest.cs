@@ -33,23 +33,39 @@ public class JsonTest
 
         Assert.That(JsonSerializer.Deserialize<ReadOnlyUtf8String>("\"my utf8 str\""),
             Is.EqualTo(new ReadOnlyUtf8String("my utf8 str"u8.ToArray())));
+    }
+
+    [Test]
+    public void NullTest()
+    {
+        Assert.That(JsonSerializer.Serialize<string?>(null),
+            Is.EqualTo("null"));
 
         Assert.That(JsonSerializer.Deserialize<string>("null"),
             Is.EqualTo(null));
 
+        Assert.That(JsonSerializer.Serialize(string.Empty),
+            Is.EqualTo("\"\""));
+
         Assert.That(JsonSerializer.Deserialize<string>("\"\""),
             Is.EqualTo(string.Empty));
 
-        Assert.That(JsonSerializer.Deserialize<Utf8String>("null"),
-            Is.EqualTo(Utf8String.Empty));
-
-        Assert.That(JsonSerializer.Deserialize<ReadOnlyUtf8String>("null"),
-            Is.EqualTo(ReadOnlyUtf8String.Empty));
+        Assert.That(JsonSerializer.Serialize(Utf8String.Empty),
+            Is.EqualTo("\"\""));
 
         Assert.That(JsonSerializer.Deserialize<Utf8String>("\"\""),
             Is.EqualTo(Utf8String.Empty));
 
+        Assert.That(JsonSerializer.Deserialize<Utf8String>("null"),
+            Is.EqualTo(Utf8String.Empty));
+
+        Assert.That(JsonSerializer.Serialize(ReadOnlyUtf8String.Empty),
+            Is.EqualTo("\"\""));
+
         Assert.That(JsonSerializer.Deserialize<ReadOnlyUtf8String>("\"\""),
+            Is.EqualTo(ReadOnlyUtf8String.Empty));
+
+        Assert.That(JsonSerializer.Deserialize<ReadOnlyUtf8String>("null"),
             Is.EqualTo(ReadOnlyUtf8String.Empty));
     }
 

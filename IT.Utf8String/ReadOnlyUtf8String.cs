@@ -57,13 +57,11 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
         public override ReadOnlyUtf8String Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var tokenType = reader.TokenType;
-            if (tokenType == JsonTokenType.Null) return Empty;
-
+            if (tokenType == JsonTokenType.Null) return default;
             if (tokenType != JsonTokenType.String) throw new JsonException("Expected string");
 
             var length = reader.HasValueSequence ? reader.ValueSequence.Length : reader.ValueSpan.Length;
-
-            if (length == 0) return Empty;
+            if (length == 0) return default;
 
             var bytes = new byte[length];
 

@@ -200,10 +200,10 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
         => System.Runtime.InteropServices.MemoryMarshal.TryGetArray(_value, out segment);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Utf8String Slice(int start) => new(Memory.Slice(start));
+    public Utf8String Slice(int start) => new(_value.Slice(start));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Utf8String Slice(int start, int length) => new(Memory.Slice(start, length));
+    public Utf8String Slice(int start, int length) => new(_value.Slice(start, length));
 
     public ReadOnlyUtf8String AsReadOnly() => new(_value);
 

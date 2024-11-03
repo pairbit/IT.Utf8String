@@ -200,10 +200,10 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
         => System.Runtime.InteropServices.MemoryMarshal.TryGetArray(_value, out segment);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ReadOnlyUtf8String Slice(int start) => new(Memory.Slice(start));
+    public ReadOnlyUtf8String Slice(int start) => new(_value.Slice(start));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ReadOnlyUtf8String Slice(int start, int length) => new(Memory.Slice(start, length));
+    public ReadOnlyUtf8String Slice(int start, int length) => new(_value.Slice(start, length));
 
     public static bool operator ==(ReadOnlyUtf8String left, ReadOnlyUtf8String right) => left.Equals(right);
 

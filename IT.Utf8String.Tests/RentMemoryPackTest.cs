@@ -171,4 +171,59 @@ public class PoolModelSampleTest
     }
 }
 
+internal static class ArrayPoolShared
+{
+    private static bool _addToList;
+
+    [ThreadStatic]
+    private static List<Action>? _list;
+
+    public static bool IsEnabled => _addToList;
+
+    public static void AddToList()
+    {
+        _addToList = true;
+    }
+
+    public static T?[] Rent<T>(int minimumLength)
+    {
+        var rented = ArrayPool<T?>.Shared.Rent(minimumLength);
+        if (_addToList)
+        {
+            var list = _list;
+            if (list == null)
+            {
+                list = _list = new List<Action>();
+            }
+
+            list.Add(() => ArrayPool<T?>.Shared.Return(rented, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>()));
+        }
+        return rented;
+    }
+
+    public static void ReturnAndClear()
+    {
+        var list = _list;
+        if (list != null && list.Count > 0)
+        {
+            foreach (var returnToPool in list)
+            {
+                returnToPool();
+            }
+            list.Clear();
+        }
+        _addToList = false;
+    }
+
+    public static void Clear()
+    {
+        var list = _list;
+        if (list != null && list.Count > 0)
+        {
+            list.Clear();
+        }
+        _addToList = false;
+    }
+}
+
 #endif

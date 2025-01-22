@@ -133,7 +133,7 @@ public class PoolModelSampleTest
         var binInt = MemoryPackSerializer.Serialize(new PoolModel { PayloadBytes = bytes, PayloadInts = ints, Id = 0 });
 
         PoolModel? model = null;
-        //ArrayPoolShared.AddToList();
+        ArrayPoolShared.AddToList();
         try
         {
             var consumed = MemoryPackSerializer.Deserialize(binByte, ref model);
@@ -270,9 +270,14 @@ internal static class ArrayPoolShared
         var state = _threadStaticState;
         if (state != null && state._addToList)
         {
-            state._list.Add(() => ArrayPool<T?>.Shared.Return(rented, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>()));
+            state._list.Add((rented, Return<T>));
         }
         return rented;
+    }
+
+    private static void Return<T>(Array array)
+    {
+        ArrayPool<T?>.Shared.Return((T[])array, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>());
     }
 
     public static void ReturnAndClear()
@@ -281,11 +286,11 @@ internal static class ArrayPoolShared
         if (state != null)
         {
             var list = state._list;
-            if (list != null && list.Count > 0)
+            if (list.Count > 0)
             {
-                foreach (var returnToPool in list)
+                foreach (var (array, returnToPool) in list)
                 {
-                    returnToPool();
+                    returnToPool(array);
                 }
                 list.Clear();
             }
@@ -299,7 +304,7 @@ internal static class ArrayPoolShared
         if (state != null)
         {
             var list = state._list;
-            if (list != null && list.Count > 0)
+            if (list.Count > 0)
             {
                 list.Clear();
             }
@@ -310,7 +315,7 @@ internal static class ArrayPoolShared
     class State
     {
         public bool _addToList;
-        public readonly List<Action> _list = [];
+        public readonly List<(Array, Action<Array>)> _list = [];
     }
 }
 

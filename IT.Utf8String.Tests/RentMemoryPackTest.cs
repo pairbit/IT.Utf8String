@@ -4,8 +4,6 @@ using MemoryPack;
 using MemoryPack.Formatters;
 using MemoryPack.Internal;
 using System.Buffers;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -250,27 +248,27 @@ public class PoolModelSampleTest
 internal static class ArrayPoolShared
 {
     [ThreadStatic]
-    private static State? _threadStaticState;
+    private static RentedList? _rentedList;
 
-    public static bool IsEnabled => _threadStaticState != null && _threadStaticState._addToList;
+    public static bool IsEnabled => _rentedList != null && _rentedList.enabled;
 
     public static void AddToList()
     {
-        var state = _threadStaticState;
-        if (state == null)
+        var rentedList = _rentedList;
+        if (rentedList == null)
         {
-            state = _threadStaticState = new State();
+            rentedList = _rentedList = new RentedList();
         }
-        state._addToList = true;
+        rentedList.enabled = true;
     }
 
     public static T[] Rent<T>(int minimumLength)
     {
         var rented = ArrayPool<T>.Shared.Rent(minimumLength);
-        var state = _threadStaticState;
-        if (state != null && state._addToList)
+        var rentedList = _rentedList;
+        if (rentedList != null && rentedList.enabled)
         {
-            state._list.Add((rented, Return<T>));
+            rentedList.Add(new RentedArray(rented, Return<T>));
         }
         return rented;
     }
@@ -282,40 +280,49 @@ internal static class ArrayPoolShared
 
     public static void ReturnAndClear()
     {
-        var state = _threadStaticState;
-        if (state != null)
+        var rentedList = _rentedList;
+        if (rentedList != null)
         {
-            var list = state._list;
-            if (list.Count > 0)
+            if (rentedList.Count > 0)
             {
-                foreach (var (array, returnToPool) in list)
+                foreach (var rentedArray in CollectionsMarshal.AsSpan(rentedList))
                 {
-                    returnToPool(array);
+                    rentedArray.Return(rentedArray.Array);
                 }
-                list.Clear();
+                rentedList.Clear();
             }
-            state._addToList = false;
+            rentedList.enabled = false;
         }
     }
 
     public static void Clear()
     {
-        var state = _threadStaticState;
-        if (state != null)
+        var rentedList = _rentedList;
+        if (rentedList != null)
         {
-            var list = state._list;
-            if (list.Count > 0)
+            if (rentedList.Count > 0)
             {
-                list.Clear();
+                rentedList.Clear();
             }
-            state._addToList = false;
+            rentedList.enabled = false;
         }
     }
 
-    class State
+    readonly struct RentedArray
     {
-        public bool _addToList;
-        public readonly List<(Array, Action<Array>)> _list = [];
+        public readonly Array Array;
+        public readonly Action<Array> Return;
+
+        public RentedArray(Array array, Action<Array> returnToPool)
+        {
+            Array = array;
+            Return = returnToPool;
+        }
+    }
+
+    class RentedList : List<RentedArray>
+    {
+        public bool enabled;
     }
 }
 

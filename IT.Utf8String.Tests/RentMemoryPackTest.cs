@@ -2,7 +2,9 @@
 
 using MemoryPack;
 using MemoryPack.Formatters;
+using MemoryPack.Internal;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -12,6 +14,7 @@ namespace Tests;
 [MemoryPackable]
 public partial class PoolModelSample : IDisposable
 {
+    [ThreadStatic]
     internal static bool _toReturnEnabled;
 
     [ThreadStatic]
@@ -60,6 +63,56 @@ public partial class PoolModelSample : IDisposable
 }
 
 [MemoryPackable]
+public partial class PoolModel : IDisposable
+{
+    [MemoryPoolFormatter2<byte>]
+    public Memory<byte> PayloadBytes { get; set; }
+
+    [MemoryPoolFormatter2<int>]
+    public Memory<int> PayloadInts { get; set; }
+
+    public int Id { get; set; }
+
+    // You must write the return code yourself, here is snippet.
+
+    bool usePool;
+
+    [MemoryPackOnDeserialized]
+    void OnDeserialized()
+    {
+        usePool = true;
+    }
+
+    public void Dispose()
+    {
+        if (!usePool) return;
+
+        Return(PayloadBytes); PayloadBytes = default;
+        Return(PayloadInts); PayloadInts = default;
+    }
+
+    static void Return<T>(Memory<T> memory) => Return((ReadOnlyMemory<T>)memory);
+
+    static void Return<T>(ReadOnlyMemory<T> memory)
+    {
+        if (MemoryMarshal.TryGetArray(memory, out var segment) && segment.Array is { Length: > 0 })
+        {
+            ArrayPool<T>.Shared.Return(segment.Array, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>());
+        }
+    }
+}
+
+[MemoryPackable]
+public partial class ModelByte
+{
+    public byte[] PayloadBytes { get; set; } = null!;
+
+    public int[] PayloadInts { get; set; } = null!;
+
+    public byte Id { get; set; }
+}
+
+[MemoryPackable]
 public partial class DataByte
 {
     public byte[] Payload { get; set; } = null!;
@@ -69,6 +122,29 @@ public partial class DataByte
 
 public class PoolModelSampleTest
 {
+    [Test]
+    public void TestPartial_Work()
+    {
+        var bytes = new byte[1];
+        Random.Shared.NextBytes(bytes);
+        var ints = new int[1];
+        ints[0] = 3;
+        var binByte = MemoryPackSerializer.Serialize(new ModelByte { PayloadBytes = bytes, PayloadInts = ints, Id = 0 });
+        var binInt = MemoryPackSerializer.Serialize(new PoolModel { PayloadBytes = bytes, PayloadInts = ints, Id = 0 });
+
+        PoolModel? model = null;
+        //ArrayPoolShared.AddToList();
+        try
+        {
+            var consumed = MemoryPackSerializer.Deserialize(binByte, ref model);
+            ArrayPoolShared.Clear();
+        }
+        catch (MemoryPackSerializationException)
+        {
+            ArrayPoolShared.ReturnAndClear();
+        }
+    }
+
     [Test]
     public void TestPartial()
     {
@@ -173,56 +249,106 @@ public class PoolModelSampleTest
 
 internal static class ArrayPoolShared
 {
-    private static bool _addToList;
-
     [ThreadStatic]
-    private static List<Action>? _list;
+    private static State? _threadStaticState;
 
-    public static bool IsEnabled => _addToList;
+    public static bool IsEnabled => _threadStaticState != null && _threadStaticState._addToList;
 
     public static void AddToList()
     {
-        _addToList = true;
+        var state = _threadStaticState;
+        if (state == null)
+        {
+            state = _threadStaticState = new State();
+        }
+        state._addToList = true;
     }
 
     public static T?[] Rent<T>(int minimumLength)
     {
         var rented = ArrayPool<T?>.Shared.Rent(minimumLength);
-        if (_addToList)
+        var state = _threadStaticState;
+        if (state != null && state._addToList)
         {
-            var list = _list;
-            if (list == null)
-            {
-                list = _list = new List<Action>();
-            }
-
-            list.Add(() => ArrayPool<T?>.Shared.Return(rented, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>()));
+            state._list.Add(() => ArrayPool<T?>.Shared.Return(rented, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>()));
         }
         return rented;
     }
 
     public static void ReturnAndClear()
     {
-        var list = _list;
-        if (list != null && list.Count > 0)
+        var state = _threadStaticState;
+        if (state != null)
         {
-            foreach (var returnToPool in list)
+            var list = state._list;
+            if (list != null && list.Count > 0)
             {
-                returnToPool();
+                foreach (var returnToPool in list)
+                {
+                    returnToPool();
+                }
+                list.Clear();
             }
-            list.Clear();
+            state._addToList = false;
         }
-        _addToList = false;
     }
 
     public static void Clear()
     {
-        var list = _list;
-        if (list != null && list.Count > 0)
+        var state = _threadStaticState;
+        if (state != null)
         {
-            list.Clear();
+            var list = state._list;
+            if (list != null && list.Count > 0)
+            {
+                list.Clear();
+            }
+            state._addToList = false;
         }
-        _addToList = false;
+    }
+
+    class State
+    {
+        public bool _addToList;
+        public readonly List<Action> _list = [];
+    }
+}
+
+public sealed class MemoryPoolFormatter2Attribute<T> : MemoryPackCustomFormatterAttribute<MemoryPoolFormatter2<T>, Memory<T?>>
+{
+    private static readonly MemoryPoolFormatter2<T> _formatter = new();
+
+    public override MemoryPoolFormatter2<T> GetFormatter() => _formatter;
+}
+
+[Preserve]
+public sealed class MemoryPoolFormatter2<T> : MemoryPackFormatter<Memory<T?>>
+{
+    [Preserve]
+    public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, scoped ref Memory<T?> value)
+    {
+        writer.WriteSpan(value.Span);
+    }
+
+    [Preserve]
+    public override void Deserialize(ref MemoryPackReader reader, scoped ref Memory<T?> value)
+    {
+        if (!reader.TryReadCollectionHeader(out var length))
+        {
+            value = null;
+            return;
+        }
+
+        if (length == 0)
+        {
+            value = Memory<T?>.Empty;
+            return;
+        }
+
+        var memory = ArrayPoolShared.Rent<T?>(length).AsMemory(0, length);
+        var span = memory.Span;
+        reader.ReadSpanWithoutReadLengthHeader(length, ref span);
+        value = memory;
     }
 }
 

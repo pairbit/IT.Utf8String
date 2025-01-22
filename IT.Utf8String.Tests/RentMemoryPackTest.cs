@@ -264,9 +264,9 @@ internal static class ArrayPoolShared
         state._addToList = true;
     }
 
-    public static T?[] Rent<T>(int minimumLength)
+    public static T[] Rent<T>(int minimumLength)
     {
-        var rented = ArrayPool<T?>.Shared.Rent(minimumLength);
+        var rented = ArrayPool<T>.Shared.Rent(minimumLength);
         var state = _threadStaticState;
         if (state != null && state._addToList)
         {
@@ -277,7 +277,7 @@ internal static class ArrayPoolShared
 
     private static void Return<T>(Array array)
     {
-        ArrayPool<T?>.Shared.Return((T[])array, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>());
+        ArrayPool<T>.Shared.Return((T[])array, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>());
     }
 
     public static void ReturnAndClear()

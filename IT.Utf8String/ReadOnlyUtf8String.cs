@@ -91,34 +91,44 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
         _value = value;
     }
 
-    #region Formattable
+    public bool TryGetArray(out ArraySegment<byte> segment)
+        => System.Runtime.InteropServices.MemoryMarshal.TryGetArray(_value, out segment);
 
-#if NET8_0_OR_GREATER
-    bool IUtf8SpanFormattable.TryFormat(Span<byte> utf8Destination, out int bytesWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ReadOnlyUtf8String Slice(int start) => new(_value.Slice(start));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ReadOnlyUtf8String Slice(int start, int length) => new(_value.Slice(start, length));
+
+    public bool Equals(ReadOnlyUtf8String other) => _value.Equals(other._value) ||
+        _value.Span.SequenceEqual(other._value.Span);
+
+    public override bool Equals(object? obj)
+        => obj is ReadOnlyUtf8String utf8String && Equals(utf8String);
+
+    public override int GetHashCode() => _value.GetHashCode();
+
+    #region ToString
+
+    public override string ToString() => _value.Length == 0 ? string.Empty : Encoding.UTF8.GetString(_value.Span);
+
+    public char[] ToChars()
     {
-        if (format.Length != 0) throw new FormatException();
+        var count = Encoding.UTF8.GetCharCount(_value.Span);
+        if (count == 0) return [];
 
-        return TryFormat(utf8Destination, out bytesWritten);
-    }
-#endif
+        var chars = new char[count];
 
 #if NET6_0_OR_GREATER
-    bool ISpanFormattable.TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
-    {
-        if (format.Length != 0) throw new FormatException();
-
-        return TryFormat(destination, out charsWritten);
-    }
+        var status = System.Text.Unicode.Utf8.ToUtf16(_value.Span, chars, out _, out _);
+        if (status != System.Buffers.OperationStatus.Done)
+            throw new InvalidOperationException($"OperationStatus is '{status}'");
+#else
+        Encoding.UTF8.GetChars(_value.Span, chars);
 #endif
 
-    string IFormattable.ToString(string? format, IFormatProvider? formatProvider)
-    {
-        if (format != null) throw new FormatException();
-
-        return ToString();
+        return chars;
     }
-
-    #endregion Formattable
 
     public bool TryFormat(Span<char> chars, out int written)
     {
@@ -166,56 +176,38 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
         return true;
     }
 
-    public bool Equals(ReadOnlyUtf8String other) => _value.Equals(other._value) ||
-        _value.Span.SequenceEqual(other._value.Span);
+    #endregion ToString
 
-    public override bool Equals(object? obj)
-        => obj is ReadOnlyUtf8String utf8String && Equals(utf8String);
+    #region Formattable
 
-    public override int GetHashCode() => _value.GetHashCode();
-
-    public override string ToString() => _value.Length == 0 ? string.Empty : Encoding.UTF8.GetString(_value.Span);
-
-    public char[] ToChars()
+#if NET8_0_OR_GREATER
+    bool IUtf8SpanFormattable.TryFormat(Span<byte> utf8Destination, out int bytesWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
     {
-        var count = Encoding.UTF8.GetCharCount(_value.Span);
-        if (count == 0) return [];
+        if (format.Length != 0) throw new FormatException();
 
-        var chars = new char[count];
-
-#if NET6_0_OR_GREATER
-        var status = System.Text.Unicode.Utf8.ToUtf16(_value.Span, chars, out _, out _);
-        if (status != System.Buffers.OperationStatus.Done)
-            throw new InvalidOperationException($"OperationStatus is '{status}'");
-#else
-        Encoding.UTF8.GetChars(_value.Span, chars);
+        return TryFormat(utf8Destination, out bytesWritten);
+    }
 #endif
 
-        return chars;
+#if NET6_0_OR_GREATER
+    bool ISpanFormattable.TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+    {
+        if (format.Length != 0) throw new FormatException();
+
+        return TryFormat(destination, out charsWritten);
+    }
+#endif
+
+    string IFormattable.ToString(string? format, IFormatProvider? formatProvider)
+    {
+        if (format != null) throw new FormatException();
+
+        return ToString();
     }
 
-    public bool TryGetArray(out ArraySegment<byte> segment)
-        => System.Runtime.InteropServices.MemoryMarshal.TryGetArray(_value, out segment);
+    #endregion Formattable
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ReadOnlyUtf8String Slice(int start) => new(_value.Slice(start));
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ReadOnlyUtf8String Slice(int start, int length) => new(_value.Slice(start, length));
-
-    public static bool operator ==(ReadOnlyUtf8String left, ReadOnlyUtf8String right) => left.Equals(right);
-
-    public static bool operator !=(ReadOnlyUtf8String left, ReadOnlyUtf8String right) => !left.Equals(right);
-
-    public static implicit operator ReadOnlyMemory<byte>(ReadOnlyUtf8String value) => value._value;
-
-    public static implicit operator ReadOnlySpan<byte>(ReadOnlyUtf8String value) => value._value.Span;
-
-    public static implicit operator ReadOnlyUtf8String(Memory<byte> value) => new(value);
-
-    public static implicit operator ReadOnlyUtf8String(ReadOnlyMemory<byte> value) => new(value);
-
-    public static implicit operator ReadOnlyUtf8String(byte[] value) => new(value);
+    #region Parse
 
     public static ReadOnlyUtf8String Parse(ReadOnlySpan<byte> bytes) => new(bytes.ToArray());
 
@@ -267,6 +259,8 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
         return true;
     }
 
+    #endregion Parse
+
     #region Parsable
 
 #if NET8_0_OR_GREATER
@@ -296,4 +290,24 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
 #endif
 
     #endregion Parsable
+
+    #region Operators
+
+    public static bool operator ==(ReadOnlyUtf8String left, ReadOnlyUtf8String right) => left.Equals(right);
+
+    public static bool operator !=(ReadOnlyUtf8String left, ReadOnlyUtf8String right) => !left.Equals(right);
+
+    public static implicit operator ReadOnlyMemory<byte>(ReadOnlyUtf8String value) => value._value;
+
+    public static implicit operator ReadOnlySpan<byte>(ReadOnlyUtf8String value) => value._value.Span;
+
+    public static implicit operator ReadOnlyUtf8String(Memory<byte> value) => new(value);
+
+    public static implicit operator ReadOnlyUtf8String(ReadOnlyMemory<byte> value) => new(value);
+
+    public static implicit operator ReadOnlyUtf8String(byte[] value) => new(value);
+
+    public static implicit operator ReadOnlyUtf8String(ArraySegment<byte> value) => new(value);
+
+    #endregion Operators
 }

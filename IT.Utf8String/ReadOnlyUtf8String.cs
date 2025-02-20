@@ -91,6 +91,12 @@ public readonly struct ReadOnlyUtf8String : IEquatable<ReadOnlyUtf8String>, IFor
         _value = value;
     }
 
+#if NET8_0_OR_GREATER
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsValid() => System.Text.Unicode.Utf8.IsValid(_value.Span);
+#endif
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryGetArray(out ArraySegment<byte> segment)
         => System.Runtime.InteropServices.MemoryMarshal.TryGetArray(_value, out segment);
 

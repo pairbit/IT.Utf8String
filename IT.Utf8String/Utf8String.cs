@@ -105,7 +105,7 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Utf8String Slice(int start, int length) => new(_value.Slice(start, length));
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ReadOnlyUtf8String AsReadOnly() => new(_value);
 

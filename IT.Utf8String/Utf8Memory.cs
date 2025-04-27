@@ -9,24 +9,24 @@ using System.Text.Json.Serialization;
 namespace IT;
 
 [DebuggerDisplay("{ToString()}")]
-[TypeConverter(typeof(ReadOnlyUtf8StringTypeConverter))]
-[JsonConverter(typeof(ReadOnlyUtf8StringJsonConverter))]
-public readonly struct ReadOnlyUtf8String : IComparable<ReadOnlyUtf8String>, IEquatable<ReadOnlyUtf8String>, IFormattable
+[TypeConverter(typeof(Utf8MemoryTypeConverter))]
+[JsonConverter(typeof(Utf8MemoryJsonConverter))]
+public readonly struct Utf8Memory : IComparable<Utf8Memory>, IEquatable<Utf8Memory>, IFormattable
 #if NET6_0_OR_GREATER
 , ISpanFormattable
 #endif
 #if NET7_0_OR_GREATER
-, ISpanParsable<ReadOnlyUtf8String>
+, ISpanParsable<Utf8Memory>
 #endif
 #if NET8_0_OR_GREATER
-, IUtf8SpanFormattable, IUtf8SpanParsable<ReadOnlyUtf8String>
+, IUtf8SpanFormattable, IUtf8SpanParsable<Utf8Memory>
 #endif
 {
-    class ReadOnlyUtf8StringTypeConverter : TypeConverter
+    class Utf8MemoryTypeConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
-            => sourceType == typeof(ReadOnlyUtf8String) ||
-               sourceType == typeof(Utf8String) ||
+            => sourceType == typeof(Utf8Memory) ||
+               sourceType == typeof(ReadOnlyUtf8Memory) ||
                sourceType == typeof(string) ||
                sourceType == typeof(char[]) ||
                sourceType == typeof(Memory<char>) ||
@@ -38,23 +38,23 @@ public readonly struct ReadOnlyUtf8String : IComparable<ReadOnlyUtf8String>, IEq
 
         public override object? ConvertFrom(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
         {
-            if (value is ReadOnlyUtf8String readOnlyUtf8String) return readOnlyUtf8String;
-            if (value is Utf8String utf8String) return utf8String.AsReadOnly();
-            if (value is string str) return new ReadOnlyUtf8String(Parse(str.AsSpan()));
-            if (value is char[] chars) return new ReadOnlyUtf8String(Parse(chars));
-            if (value is Memory<char> memoryChar) return new ReadOnlyUtf8String(Parse(memoryChar.Span));
-            if (value is ReadOnlyMemory<char> readOnlyMemoryChar) return new ReadOnlyUtf8String(Parse(readOnlyMemoryChar.Span));
-            if (value is byte[] bytes) return new ReadOnlyUtf8String(bytes);
-            if (value is Memory<byte> memoryByte) return new ReadOnlyUtf8String(memoryByte);
-            if (value is ReadOnlyMemory<byte> readOnlyMemoryByte) return new ReadOnlyUtf8String(readOnlyMemoryByte.ToArray());
+            if (value is Utf8Memory utf8Memory) return utf8Memory;
+            if (value is ReadOnlyUtf8Memory readOnlyUtf8Memory) return new Utf8Memory(readOnlyUtf8Memory.Memory.ToArray());
+            if (value is string str) return new Utf8Memory(Parse(str.AsSpan()));
+            if (value is char[] chars) return new Utf8Memory(Parse(chars));
+            if (value is Memory<char> memoryChar) return new Utf8Memory(Parse(memoryChar.Span));
+            if (value is ReadOnlyMemory<char> readOnlyMemoryChar) return new Utf8Memory(Parse(readOnlyMemoryChar.Span));
+            if (value is byte[] bytes) return new Utf8Memory(bytes);
+            if (value is Memory<byte> memoryByte) return new Utf8Memory(memoryByte);
+            if (value is ReadOnlyMemory<byte> readOnlyMemoryByte) return new Utf8Memory(readOnlyMemoryByte.ToArray());
 
             return base.ConvertFrom(context, culture, value);
         }
     }
 
-    class ReadOnlyUtf8StringJsonConverter : JsonConverter<ReadOnlyUtf8String>
+    class Utf8MemoryJsonConverter : JsonConverter<Utf8Memory>
     {
-        public override ReadOnlyUtf8String Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override Utf8Memory Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var tokenType = reader.TokenType;
             if (tokenType == JsonTokenType.Null) return default;
@@ -70,23 +70,23 @@ public readonly struct ReadOnlyUtf8String : IComparable<ReadOnlyUtf8String>, IEq
             return bytes.AsMemory(0, written);
         }
 
-        public override void Write(Utf8JsonWriter writer, ReadOnlyUtf8String value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, Utf8Memory value, JsonSerializerOptions options)
             => writer.WriteStringValue(value);
     }
 
-    private readonly ReadOnlyMemory<byte> _value;
+    private readonly Memory<byte> _value;
 
-    public static ReadOnlyUtf8String Empty => default;
+    public static Utf8Memory Empty => default;
 
-    public ReadOnlyMemory<byte> Memory => _value;
+    public Memory<byte> Memory => _value;
 
-    public ReadOnlySpan<byte> Span => _value.Span;
+    public Span<byte> Span => _value.Span;
 
     public int Length => _value.Length;
 
     public bool IsEmpty => _value.Length == 0;
 
-    public ReadOnlyUtf8String(ReadOnlyMemory<byte> value)
+    public Utf8Memory(Memory<byte> value)
     {
         _value = value;
     }
@@ -101,18 +101,21 @@ public readonly struct ReadOnlyUtf8String : IComparable<ReadOnlyUtf8String>, IEq
         => System.Runtime.InteropServices.MemoryMarshal.TryGetArray(_value, out segment);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ReadOnlyUtf8String Slice(int start) => new(_value.Slice(start));
+    public Utf8Memory Slice(int start) => new(_value.Slice(start));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ReadOnlyUtf8String Slice(int start, int length) => new(_value.Slice(start, length));
+    public Utf8Memory Slice(int start, int length) => new(_value.Slice(start, length));
 
-    public int CompareTo(ReadOnlyUtf8String other) => _value.Span.SequenceCompareTo(other._value.Span);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ReadOnlyUtf8Memory AsReadOnly() => new(_value);
 
-    public bool Equals(ReadOnlyUtf8String other) => _value.Equals(other._value) ||
+    public int CompareTo(Utf8Memory other) => _value.Span.SequenceCompareTo(other._value.Span);
+
+    public bool Equals(Utf8Memory other) => _value.Equals(other._value) ||
         _value.Span.SequenceEqual(other._value.Span);
 
     public override bool Equals(object? obj)
-        => obj is ReadOnlyUtf8String utf8String && Equals(utf8String);
+        => obj is Utf8Memory utf8Memory && Equals(utf8Memory);
 
     public override int GetHashCode()
     {
@@ -222,16 +225,16 @@ public readonly struct ReadOnlyUtf8String : IComparable<ReadOnlyUtf8String>, IEq
 
     #region Parse
 
-    public static ReadOnlyUtf8String Parse(ReadOnlySpan<byte> bytes) => new(bytes.ToArray());
+    public static Utf8Memory Parse(ReadOnlySpan<byte> bytes) => new(bytes.ToArray());
 
-    public static bool TryParse(ReadOnlySpan<byte> bytes, out ReadOnlyUtf8String utf8String)
+    public static bool TryParse(ReadOnlySpan<byte> bytes, out Utf8Memory utf8Memory)
     {
-        utf8String = new(bytes.ToArray());
+        utf8Memory = new(bytes.ToArray());
         return true;
     }
 
     /// <exception cref="ArgumentException"></exception>
-    public static ReadOnlyUtf8String Parse(ReadOnlySpan<char> chars)
+    public static Utf8Memory Parse(ReadOnlySpan<char> chars)
     {
         var count = Encoding.UTF8.GetByteCount(chars);
         if (count == 0) return default;
@@ -247,12 +250,12 @@ public readonly struct ReadOnlyUtf8String : IComparable<ReadOnlyUtf8String>, IEq
         return new(bytes);
     }
 
-    public static bool TryParse(ReadOnlySpan<char> chars, out ReadOnlyUtf8String utf8String)
+    public static bool TryParse(ReadOnlySpan<char> chars, out Utf8Memory utf8Memory)
     {
         var count = Encoding.UTF8.GetByteCount(chars);
         if (count == 0)
         {
-            utf8String = default;
+            utf8Memory = default;
             return true;
         }
 
@@ -262,13 +265,13 @@ public readonly struct ReadOnlyUtf8String : IComparable<ReadOnlyUtf8String>, IEq
 
         if (status != System.Buffers.OperationStatus.Done)
         {
-            utf8String = default;
+            utf8Memory = default;
             return false;
         }
 #else
         Encoding.UTF8.GetBytes(chars, bytes);
 #endif
-        utf8String = new(bytes);
+        utf8Memory = new(bytes);
         return true;
     }
 
@@ -278,26 +281,26 @@ public readonly struct ReadOnlyUtf8String : IComparable<ReadOnlyUtf8String>, IEq
 
 #if NET8_0_OR_GREATER
 
-    static ReadOnlyUtf8String IUtf8SpanParsable<ReadOnlyUtf8String>.Parse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider)
+    static Utf8Memory IUtf8SpanParsable<Utf8Memory>.Parse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider)
         => Parse(utf8Text);
 
-    static bool IUtf8SpanParsable<ReadOnlyUtf8String>.TryParse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out ReadOnlyUtf8String result)
+    static bool IUtf8SpanParsable<Utf8Memory>.TryParse(ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out Utf8Memory result)
         => TryParse(utf8Text, out result);
 
 #endif
 
 #if NET7_0_OR_GREATER
 
-    static ReadOnlyUtf8String ISpanParsable<ReadOnlyUtf8String>.Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
+    static Utf8Memory ISpanParsable<Utf8Memory>.Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
         => Parse(s);
 
-    static bool ISpanParsable<ReadOnlyUtf8String>.TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out ReadOnlyUtf8String result)
+    static bool ISpanParsable<Utf8Memory>.TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out Utf8Memory result)
         => TryParse(s, out result);
 
-    static ReadOnlyUtf8String IParsable<ReadOnlyUtf8String>.Parse(string s, IFormatProvider? provider)
+    static Utf8Memory IParsable<Utf8Memory>.Parse(string s, IFormatProvider? provider)
         => Parse(s);
 
-    static bool IParsable<ReadOnlyUtf8String>.TryParse([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] string? s, IFormatProvider? provider, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out ReadOnlyUtf8String result)
+    static bool IParsable<Utf8Memory>.TryParse([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] string? s, IFormatProvider? provider, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out Utf8Memory result)
         => TryParse(s, out result);
 
 #endif
@@ -306,21 +309,25 @@ public readonly struct ReadOnlyUtf8String : IComparable<ReadOnlyUtf8String>, IEq
 
     #region Operators
 
-    public static bool operator ==(ReadOnlyUtf8String left, ReadOnlyUtf8String right) => left.Equals(right);
+    public static bool operator ==(Utf8Memory left, Utf8Memory right) => left.Equals(right);
 
-    public static bool operator !=(ReadOnlyUtf8String left, ReadOnlyUtf8String right) => !left.Equals(right);
+    public static bool operator !=(Utf8Memory left, Utf8Memory right) => !left.Equals(right);
 
-    public static implicit operator ReadOnlyMemory<byte>(ReadOnlyUtf8String value) => value._value;
+    public static implicit operator Memory<byte>(Utf8Memory value) => value._value;
 
-    public static implicit operator ReadOnlySpan<byte>(ReadOnlyUtf8String value) => value._value.Span;
+    public static implicit operator Span<byte>(Utf8Memory value) => value._value.Span;
 
-    public static implicit operator ReadOnlyUtf8String(Memory<byte> value) => new(value);
+    public static implicit operator ReadOnlyMemory<byte>(Utf8Memory value) => value._value;
 
-    public static implicit operator ReadOnlyUtf8String(ReadOnlyMemory<byte> value) => new(value);
+    public static implicit operator ReadOnlySpan<byte>(Utf8Memory value) => value._value.Span;
 
-    public static implicit operator ReadOnlyUtf8String(byte[] value) => new(value);
+    public static implicit operator ReadOnlyUtf8Memory(Utf8Memory value) => new(value._value);
 
-    public static implicit operator ReadOnlyUtf8String(ArraySegment<byte> value) => new(value);
+    public static implicit operator Utf8Memory(Memory<byte> value) => new(value);
+
+    public static implicit operator Utf8Memory(byte[] value) => new(value);
+
+    public static implicit operator Utf8Memory(ArraySegment<byte> value) => new(value);
 
     #endregion Operators
 }

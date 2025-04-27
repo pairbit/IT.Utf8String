@@ -29,8 +29,8 @@ public class Utf8StringInputFormatter : InputFormatter
         if (bytes != null)
         {
             var modelType = context.ModelType;
-            if (modelType == typeof(Utf8String)) return InputFormatterResult.Success(new Utf8String(bytes));
-            if (modelType == typeof(ReadOnlyUtf8String)) return InputFormatterResult.Success(new ReadOnlyUtf8String(bytes));
+            if (modelType == typeof(Utf8Memory)) return InputFormatterResult.Success(new Utf8Memory(bytes));
+            if (modelType == typeof(ReadOnlyUtf8Memory)) return InputFormatterResult.Success(new ReadOnlyUtf8Memory(bytes));
 
             throw new NotSupportedException($"Type {modelType} not supported");
         }
@@ -38,14 +38,14 @@ public class Utf8StringInputFormatter : InputFormatter
         return InputFormatterResult.Failure();
     }
 
-    protected override bool CanReadType(Type type) => type == typeof(Utf8String) || type == typeof(ReadOnlyUtf8String);
+    protected override bool CanReadType(Type type) => type == typeof(Utf8Memory) || type == typeof(ReadOnlyUtf8Memory);
 
     protected override object? GetDefaultValueForType(Type modelType)
     {
         if (modelType == null) throw new ArgumentNullException(nameof(modelType));
 
-        if (modelType == typeof(Utf8String)) return Utf8String.Empty;
-        if (modelType == typeof(ReadOnlyUtf8String)) return ReadOnlyUtf8String.Empty;
+        if (modelType == typeof(Utf8Memory)) return Utf8Memory.Empty;
+        if (modelType == typeof(ReadOnlyUtf8Memory)) return ReadOnlyUtf8Memory.Empty;
 
         throw new NotSupportedException($"Type {modelType} not supported");
     }

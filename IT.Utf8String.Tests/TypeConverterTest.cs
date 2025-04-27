@@ -8,10 +8,10 @@ public class TypeConverterTest
     [Test]
     public void CanConvertFrom_Test()
     {
-        var typeConverter = TypeDescriptor.GetConverter(typeof(Utf8String));
+        var typeConverter = TypeDescriptor.GetConverter(typeof(Utf8Memory));
 
-        Assert.That(typeConverter.CanConvertFrom(typeof(Utf8String)), Is.True);
-        Assert.That(typeConverter.CanConvertFrom(typeof(ReadOnlyUtf8String)), Is.True);
+        Assert.That(typeConverter.CanConvertFrom(typeof(Utf8Memory)), Is.True);
+        Assert.That(typeConverter.CanConvertFrom(typeof(ReadOnlyUtf8Memory)), Is.True);
         Assert.That(typeConverter.CanConvertFrom(typeof(string)), Is.True);
         Assert.That(typeConverter.CanConvertFrom(typeof(char[])), Is.True);
         Assert.That(typeConverter.CanConvertFrom(typeof(Memory<char>)), Is.True);
@@ -25,31 +25,31 @@ public class TypeConverterTest
     [Test]
     public void ConvertFrom_Test()
     {
-        var typeConverter = TypeDescriptor.GetConverter(typeof(Utf8String));
+        var typeConverter = TypeDescriptor.GetConverter(typeof(Utf8Memory));
 
-        Assert.That(typeConverter.ConvertFrom(Utf8String.Parse("Utf8String"u8)), Is.EqualTo(Utf8String.Parse("Utf8String"u8)));
-        Assert.That(typeConverter.ConvertFrom(ReadOnlyUtf8String.Parse("ReadOnlyUtf8String"u8)), Is.EqualTo(Utf8String.Parse("ReadOnlyUtf8String"u8)));
+        Assert.That(typeConverter.ConvertFrom(Utf8Memory.Parse("Utf8Memory"u8)), Is.EqualTo(Utf8Memory.Parse("Utf8Memory"u8)));
+        Assert.That(typeConverter.ConvertFrom(ReadOnlyUtf8Memory.Parse("ReadOnlyUtf8Memory"u8)), Is.EqualTo(Utf8Memory.Parse("ReadOnlyUtf8Memory"u8)));
 
-        Assert.That(typeConverter.ConvertFromString("str"), Is.EqualTo(Utf8String.Parse("str"u8)));
-        Assert.That(typeConverter.ConvertFromInvariantString("InvStr"), Is.EqualTo(Utf8String.Parse("InvStr"u8)));
-        Assert.That(typeConverter.ConvertFrom("string"), Is.EqualTo(Utf8String.Parse("string"u8)));
+        Assert.That(typeConverter.ConvertFromString("str"), Is.EqualTo(Utf8Memory.Parse("str"u8)));
+        Assert.That(typeConverter.ConvertFromInvariantString("InvStr"), Is.EqualTo(Utf8Memory.Parse("InvStr"u8)));
+        Assert.That(typeConverter.ConvertFrom("string"), Is.EqualTo(Utf8Memory.Parse("string"u8)));
 
-        Assert.That(typeConverter.ConvertFrom("char[]".ToCharArray()), Is.EqualTo(Utf8String.Parse("char[]"u8)));
-        Assert.That(typeConverter.ConvertFrom("Memory<char>".ToCharArray().AsMemory()), Is.EqualTo(Utf8String.Parse("Memory<char>"u8)));
-        Assert.That(typeConverter.ConvertFrom((ReadOnlyMemory<char>)"ReadOnlyMemory<char>".ToCharArray().AsMemory()), Is.EqualTo(Utf8String.Parse("ReadOnlyMemory<char>"u8)));
+        Assert.That(typeConverter.ConvertFrom("char[]".ToCharArray()), Is.EqualTo(Utf8Memory.Parse("char[]"u8)));
+        Assert.That(typeConverter.ConvertFrom("Memory<char>".ToCharArray().AsMemory()), Is.EqualTo(Utf8Memory.Parse("Memory<char>"u8)));
+        Assert.That(typeConverter.ConvertFrom((ReadOnlyMemory<char>)"ReadOnlyMemory<char>".ToCharArray().AsMemory()), Is.EqualTo(Utf8Memory.Parse("ReadOnlyMemory<char>"u8)));
 
-        Assert.That(typeConverter.ConvertFrom("byte[]"u8.ToArray()), Is.EqualTo(Utf8String.Parse("byte[]"u8)));
-        Assert.That(typeConverter.ConvertFrom("Memory<byte>"u8.ToArray().AsMemory()), Is.EqualTo(Utf8String.Parse("Memory<byte>"u8)));
-        Assert.That(typeConverter.ConvertFrom((ReadOnlyMemory<byte>)"ReadOnlyMemory<byte>"u8.ToArray().AsMemory()), Is.EqualTo(Utf8String.Parse("ReadOnlyMemory<byte>"u8)));
+        Assert.That(typeConverter.ConvertFrom("byte[]"u8.ToArray()), Is.EqualTo(Utf8Memory.Parse("byte[]"u8)));
+        Assert.That(typeConverter.ConvertFrom("Memory<byte>"u8.ToArray().AsMemory()), Is.EqualTo(Utf8Memory.Parse("Memory<byte>"u8)));
+        Assert.That(typeConverter.ConvertFrom((ReadOnlyMemory<byte>)"ReadOnlyMemory<byte>"u8.ToArray().AsMemory()), Is.EqualTo(Utf8Memory.Parse("ReadOnlyMemory<byte>"u8)));
     }
 
     [Test]
     public void RO_CanConvertFrom_Test()
     {
-        var typeConverter = TypeDescriptor.GetConverter(typeof(ReadOnlyUtf8String));
+        var typeConverter = TypeDescriptor.GetConverter(typeof(ReadOnlyUtf8Memory));
 
-        Assert.That(typeConverter.CanConvertFrom(typeof(Utf8String)), Is.True);
-        Assert.That(typeConverter.CanConvertFrom(typeof(ReadOnlyUtf8String)), Is.True);
+        Assert.That(typeConverter.CanConvertFrom(typeof(Utf8Memory)), Is.True);
+        Assert.That(typeConverter.CanConvertFrom(typeof(ReadOnlyUtf8Memory)), Is.True);
         Assert.That(typeConverter.CanConvertFrom(typeof(string)), Is.True);
         Assert.That(typeConverter.CanConvertFrom(typeof(char[])), Is.True);
         Assert.That(typeConverter.CanConvertFrom(typeof(Memory<char>)), Is.True);
@@ -63,21 +63,21 @@ public class TypeConverterTest
     [Test]
     public void RO_ConvertFrom_Test()
     {
-        var typeConverter = TypeDescriptor.GetConverter(typeof(ReadOnlyUtf8String));
+        var typeConverter = TypeDescriptor.GetConverter(typeof(ReadOnlyUtf8Memory));
 
-        Assert.That(typeConverter.ConvertFrom(Utf8String.Parse("Utf8String"u8)), Is.EqualTo(ReadOnlyUtf8String.Parse("Utf8String"u8)));
-        Assert.That(typeConverter.ConvertFrom(ReadOnlyUtf8String.Parse("ReadOnlyUtf8String"u8)), Is.EqualTo(ReadOnlyUtf8String.Parse("ReadOnlyUtf8String"u8)));
+        Assert.That(typeConverter.ConvertFrom(Utf8Memory.Parse("Utf8Memory"u8)), Is.EqualTo(ReadOnlyUtf8Memory.Parse("Utf8Memory"u8)));
+        Assert.That(typeConverter.ConvertFrom(ReadOnlyUtf8Memory.Parse("ReadOnlyUtf8Memory"u8)), Is.EqualTo(ReadOnlyUtf8Memory.Parse("ReadOnlyUtf8Memory"u8)));
 
-        Assert.That(typeConverter.ConvertFromString("str"), Is.EqualTo(ReadOnlyUtf8String.Parse("str"u8)));
-        Assert.That(typeConverter.ConvertFromInvariantString("InvStr"), Is.EqualTo(ReadOnlyUtf8String.Parse("InvStr"u8)));
-        Assert.That(typeConverter.ConvertFrom("string"), Is.EqualTo(ReadOnlyUtf8String.Parse("string"u8)));
+        Assert.That(typeConverter.ConvertFromString("str"), Is.EqualTo(ReadOnlyUtf8Memory.Parse("str"u8)));
+        Assert.That(typeConverter.ConvertFromInvariantString("InvStr"), Is.EqualTo(ReadOnlyUtf8Memory.Parse("InvStr"u8)));
+        Assert.That(typeConverter.ConvertFrom("string"), Is.EqualTo(ReadOnlyUtf8Memory.Parse("string"u8)));
 
-        Assert.That(typeConverter.ConvertFrom("char[]".ToCharArray()), Is.EqualTo(ReadOnlyUtf8String.Parse("char[]"u8)));
-        Assert.That(typeConverter.ConvertFrom("Memory<char>".ToCharArray().AsMemory()), Is.EqualTo(ReadOnlyUtf8String.Parse("Memory<char>"u8)));
-        Assert.That(typeConverter.ConvertFrom((ReadOnlyMemory<char>)"ReadOnlyMemory<char>".ToCharArray().AsMemory()), Is.EqualTo(ReadOnlyUtf8String.Parse("ReadOnlyMemory<char>"u8)));
+        Assert.That(typeConverter.ConvertFrom("char[]".ToCharArray()), Is.EqualTo(ReadOnlyUtf8Memory.Parse("char[]"u8)));
+        Assert.That(typeConverter.ConvertFrom("Memory<char>".ToCharArray().AsMemory()), Is.EqualTo(ReadOnlyUtf8Memory.Parse("Memory<char>"u8)));
+        Assert.That(typeConverter.ConvertFrom((ReadOnlyMemory<char>)"ReadOnlyMemory<char>".ToCharArray().AsMemory()), Is.EqualTo(ReadOnlyUtf8Memory.Parse("ReadOnlyMemory<char>"u8)));
 
-        Assert.That(typeConverter.ConvertFrom("byte[]"u8.ToArray()), Is.EqualTo(ReadOnlyUtf8String.Parse("byte[]"u8)));
-        Assert.That(typeConverter.ConvertFrom("Memory<byte>"u8.ToArray().AsMemory()), Is.EqualTo(ReadOnlyUtf8String.Parse("Memory<byte>"u8)));
-        Assert.That(typeConverter.ConvertFrom((ReadOnlyMemory<byte>)"ReadOnlyMemory<byte>"u8.ToArray().AsMemory()), Is.EqualTo(ReadOnlyUtf8String.Parse("ReadOnlyMemory<byte>"u8)));
+        Assert.That(typeConverter.ConvertFrom("byte[]"u8.ToArray()), Is.EqualTo(ReadOnlyUtf8Memory.Parse("byte[]"u8)));
+        Assert.That(typeConverter.ConvertFrom("Memory<byte>"u8.ToArray().AsMemory()), Is.EqualTo(ReadOnlyUtf8Memory.Parse("Memory<byte>"u8)));
+        Assert.That(typeConverter.ConvertFrom((ReadOnlyMemory<byte>)"ReadOnlyMemory<byte>"u8.ToArray().AsMemory()), Is.EqualTo(ReadOnlyUtf8Memory.Parse("ReadOnlyMemory<byte>"u8)));
     }
 }

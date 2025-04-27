@@ -7,14 +7,14 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company />
-    <Description>Input/Output Formatter for types Utf8String and ReadOnlyUtf8String</Description>
+    <Description>Input/Output Formatter for types Utf8Memory and ReadOnlyUtf8Memory</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/pairbit/IT.Utf8String</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <Authors>Ivan Tikhonov</Authors>
     <Copyright>Ivan Tikhonov © 2024</Copyright>
-    <Version>2.0.10</Version>
-    <PackageTags>Utf8String AspNetCore</PackageTags>
+    <Version>2.0.11</Version>
+    <PackageTags>Utf8Memory AspNetCore</PackageTags>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <PackageIcon>Icon.png</PackageIcon>
     <PackageReleaseNotes></PackageReleaseNotes>

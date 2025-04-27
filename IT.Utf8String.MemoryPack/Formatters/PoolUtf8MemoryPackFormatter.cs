@@ -6,28 +6,28 @@ using System.Runtime.InteropServices;
 
 namespace MemoryPack.Formatters;
 
-public sealed class Utf8StringPoolMemoryPackFormatter : MemoryPackFormatter<Utf8String>
+public sealed class PoolUtf8MemoryPackFormatter : MemoryPackFormatter<Utf8Memory>
 {
-    public static readonly Utf8StringPoolMemoryPackFormatter Default = new();
+    public static readonly PoolUtf8MemoryPackFormatter Default = new();
 
     private readonly ArrayPool<byte>? _pool;
 
-    public Utf8StringPoolMemoryPackFormatter()
+    public PoolUtf8MemoryPackFormatter()
     {
         _pool = null;
     }
 
-    public Utf8StringPoolMemoryPackFormatter(ArrayPool<byte> pool)
+    public PoolUtf8MemoryPackFormatter(ArrayPool<byte> pool)
     {
         _pool = pool;
     }
 
-    public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, scoped ref Utf8String value)
+    public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, scoped ref Utf8Memory value)
     {
         writer.WriteUnmanagedSpan(value.Span);
     }
 
-    public override void Deserialize(ref MemoryPackReader reader, scoped ref Utf8String value)
+    public override void Deserialize(ref MemoryPackReader reader, scoped ref Utf8Memory value)
     {
         if (!reader.TryReadCollectionHeader(out var length) || length == 0)
         {

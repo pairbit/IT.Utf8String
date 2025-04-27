@@ -20,15 +20,15 @@ public class Utf8StringOutputFormatter : OutputFormatter
 
         var writer = context.HttpContext.Response.BodyWriter;
 
-        if (obj is Utf8String utf8String)
+        if (obj is Utf8Memory utf8Memory)
         {
-            if (utf8String.Length > 0)
-                writer.Write(utf8String.Span);
+            if (utf8Memory.Length > 0)
+                writer.Write(utf8Memory.Span);
         }
-        else if (obj is ReadOnlyUtf8String readOnlyUtf8String)
+        else if (obj is ReadOnlyUtf8Memory readOnlyUtf8Memory)
         {
-            if (readOnlyUtf8String.Length > 0)
-                writer.Write(readOnlyUtf8String.Span);
+            if (readOnlyUtf8Memory.Length > 0)
+                writer.Write(readOnlyUtf8Memory.Span);
         }
         else
         {
@@ -38,5 +38,5 @@ public class Utf8StringOutputFormatter : OutputFormatter
         return writer.FlushAsync().AsTask();
     }
 
-    protected override bool CanWriteType(Type? type) => type == typeof(Utf8String) || type == typeof(ReadOnlyUtf8String);
+    protected override bool CanWriteType(Type? type) => type == typeof(Utf8Memory) || type == typeof(ReadOnlyUtf8Memory);
 }

@@ -13,23 +13,23 @@ public partial record Strs
 {
     static partial void StaticConstructor()
     {
-        if (!MemoryPackFormatterProvider.IsRegistered<Utf8String>())
+        if (!MemoryPackFormatterProvider.IsRegistered<Utf8Memory>())
         {
-            MemoryPackFormatterProvider.Register(Utf8StringMemoryPackFormatter.Default);
+            MemoryPackFormatterProvider.Register(Utf8MemoryPackFormatter.Default);
         }
-        if (!MemoryPackFormatterProvider.IsRegistered<ReadOnlyUtf8String>())
+        if (!MemoryPackFormatterProvider.IsRegistered<ReadOnlyUtf8Memory>())
         {
-            MemoryPackFormatterProvider.Register(ReadOnlyUtf8StringMemoryPackFormatter.Default);
+            MemoryPackFormatterProvider.Register(ReadOnlyUtf8MemoryPackFormatter.Default);
         }
     }
 
     public string Str { get; set; } = null!;
 
     [MemoryPackAllowSerialize]
-    public Utf8String Utf8Str { get; set; }
+    public Utf8Memory Utf8Str { get; set; }
 
     [MemoryPackAllowSerialize]
-    public ReadOnlyUtf8String ROUtf8Str { get; set; }
+    public ReadOnlyUtf8Memory ROUtf8Str { get; set; }
 }
 
 [MemoryPackable]
@@ -40,12 +40,12 @@ public partial class StrsPool : IDisposable, IEquatable<StrsPool>
     public string Str { get; set; } = null!;
 
     [MemoryPackAllowSerialize]
-    [Utf8StringPoolFormatter]
-    public Utf8String Utf8Str { get; set; }
+    [PoolUtf8MemoryFormatter]
+    public Utf8Memory Utf8Str { get; set; }
 
     [MemoryPackAllowSerialize]
-    [ReadOnlyUtf8StringPoolFormatter]
-    public ReadOnlyUtf8String ROUtf8Str { get; set; }
+    [PoolReadOnlyUtf8MemoryFormatter]
+    public ReadOnlyUtf8Memory ROUtf8Str { get; set; }
 
     public void Dispose()
     {
@@ -92,7 +92,7 @@ public class MemoryPackTest
     public void BaseTest()
     {
         var str = "string";
-        var utf8Str = new Utf8String("string"u8.ToArray());
+        var utf8Str = new Utf8Memory("string"u8.ToArray());
 
         var str16Bytes = MemoryPackSerializer.Serialize(str, MemoryPackSerializerOptions.Utf16);
         Assert.That(str16Bytes.Length, Is.EqualTo(16));
@@ -100,7 +100,7 @@ public class MemoryPackTest
         var strBytes = MemoryPackSerializer.Serialize(str, MemoryPackSerializerOptions.Utf8);
         Assert.That(strBytes.Length, Is.EqualTo(14));
 
-        MemoryPackFormatterProvider.Register(Utf8StringMemoryPackFormatter.Default);
+        MemoryPackFormatterProvider.Register(Utf8MemoryPackFormatter.Default);
         var utf8StrBytes = MemoryPackSerializer.Serialize(utf8Str);
         Assert.That(utf8StrBytes.Length, Is.EqualTo(10));
 

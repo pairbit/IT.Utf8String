@@ -25,12 +25,12 @@ internal class ComparableTest
     [Test]
     public void SortTest()
     {
-        var array1 = new Utf8String[] {
+        var array1 = new Utf8Memory[] {
             "str3"u8.ToArray(),
             "str1"u8.ToArray(),
             "str2"u8.ToArray()
         };
-        var array2 = new ReadOnlyUtf8String[] {
+        var array2 = new ReadOnlyUtf8Memory[] {
             "str2"u8.ToArray(),
             "str3"u8.ToArray(),
             "str1"u8.ToArray()
@@ -50,7 +50,7 @@ internal class ComparableTest
     [Test]
     public void Utf8Test()
     {
-        var strings = (Utf8String)"ssdfsdfsd3532423rsdefsdfsdfsr235sfsdfsdfsdftr1,ssdfsdfsd3532423rsdefsdfsdfsr235sfsdfsdfsdftr1"u8.ToArray();
+        var strings = (Utf8Memory)"ssdfsdfsd3532423rsdefsdfsdfsr235sfsdfsdfsdftr1,ssdfsdfsd3532423rsdefsdfsdfsr235sfsdfsdfsdftr1"u8.ToArray();
         var index = strings.Span.IndexOf((byte)',');
         var str1 = strings.Slice(0, index);
         var str2 = strings.Slice(index + 1);
@@ -61,9 +61,9 @@ internal class ComparableTest
         RO_HashSetTest(str1, str2);
     }
 
-    public void RO_HashSetTest(ReadOnlyUtf8String str1, Utf8String str2)
+    public void RO_HashSetTest(ReadOnlyUtf8Memory str1, Utf8Memory str2)
     {
-        var set = new HashSet<ReadOnlyUtf8String>();
+        var set = new HashSet<ReadOnlyUtf8Memory>();
 
         Assert.That(str1 == str2, Is.True);
         Assert.That(str1.GetHashCode(), Is.EqualTo(str2.GetHashCode()));
@@ -72,9 +72,9 @@ internal class ComparableTest
         Assert.That(set.Add(str2), Is.False);
     }
 
-    public void HashSetTest(Utf8String str1, Utf8String str2)
+    public void HashSetTest(Utf8Memory str1, Utf8Memory str2)
     {
-        var set = new HashSet<Utf8String>();
+        var set = new HashSet<Utf8Memory>();
 
         Assert.That(str1 == str2, Is.True);
         Assert.That(str1.GetHashCode(), Is.EqualTo(str2.GetHashCode()));

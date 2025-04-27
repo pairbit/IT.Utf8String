@@ -11,7 +11,7 @@ namespace IT;
 [DebuggerDisplay("{ToString()}")]
 [TypeConverter(typeof(Utf8StringTypeConverter))]
 [JsonConverter(typeof(Utf8StringJsonConverter))]
-public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
+public readonly struct Utf8String : IComparable<Utf8String>, IEquatable<Utf8String>, IFormattable
 #if NET6_0_OR_GREATER
 , ISpanFormattable
 #endif
@@ -109,13 +109,20 @@ public readonly struct Utf8String : IEquatable<Utf8String>, IFormattable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ReadOnlyUtf8String AsReadOnly() => new(_value);
 
+    public int CompareTo(Utf8String other) => _value.Span.SequenceCompareTo(other._value.Span);
+
     public bool Equals(Utf8String other) => _value.Equals(other._value) ||
         _value.Span.SequenceEqual(other._value.Span);
 
     public override bool Equals(object? obj)
         => obj is Utf8String utf8String && Equals(utf8String);
 
-    public override int GetHashCode() => _value.GetHashCode();
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        hash.AddBytes(_value.Span);
+        return hash.ToHashCode();
+    }
 
     #region ToString
 

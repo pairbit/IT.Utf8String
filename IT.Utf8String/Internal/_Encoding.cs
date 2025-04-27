@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace System.Text;
 
-public static class _Encoding
+internal static class _Encoding
 {
     public static unsafe int GetByteCount(this Encoding encoding, ReadOnlySpan<char> chars)
     {

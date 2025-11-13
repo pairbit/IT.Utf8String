@@ -11,7 +11,6 @@ internal static class xUtf8JsonReader
         if (reader.HasValueSequence)
         {
             var longLength = reader.ValueSequence.Length;
-            if (longLength == 0) return default;
             if (longLength > maxLength) throw new JsonException("string too long");
             return checked((int)longLength);
         }

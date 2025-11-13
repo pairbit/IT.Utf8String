@@ -53,6 +53,10 @@ public class FormattableTest
     [Test]
     public void ISpanFormattable_Test()
     {
+        var utf8str = new Utf8String("моя строка"u8.ToArray());
+
+        Assert.That($"Format '{utf8str}' str", Is.EqualTo("Format 'моя строка' str"));
+
         var utf8Memory = new Utf8Memory("моя строка"u8.ToArray());
         
         Assert.That($"Format '{utf8Memory}' str", Is.EqualTo("Format 'моя строка' str"));
@@ -76,13 +80,19 @@ public class FormattableTest
     [Test]
     public void IUtf8SpanFormattable_Test()
     {
-        var utf8Memory = new Utf8Memory("моя строка"u8.ToArray());
-
         Span<byte> bytes = new byte[100];
 
-        Assert.That(System.Text.Unicode.Utf8.TryWrite(bytes, $"Format '{utf8Memory}' str", out var written), Is.True);
+        var utf8str = new Utf8String("моя строка 11"u8.ToArray());
 
-        Assert.That(bytes[..written].SequenceEqual("Format 'моя строка' str"u8), Is.True);
+        Assert.That(System.Text.Unicode.Utf8.TryWrite(bytes, $"Format '{utf8str}' str", out var written), Is.True);
+
+        Assert.That(bytes[..written].SequenceEqual("Format 'моя строка 11' str"u8), Is.True);
+        
+        var utf8Memory = new Utf8Memory("моя строка 2"u8.ToArray());
+
+        Assert.That(System.Text.Unicode.Utf8.TryWrite(bytes, $"Format '{utf8Memory}' str", out written), Is.True);
+
+        Assert.That(bytes[..written].SequenceEqual("Format 'моя строка 2' str"u8), Is.True);
     }
 
     [Test]

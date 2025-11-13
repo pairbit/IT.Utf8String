@@ -40,10 +40,10 @@ public readonly struct ReadOnlyUtf8Memory : IComparable<ReadOnlyUtf8Memory>, IEq
         {
             if (value is ReadOnlyUtf8Memory readOnlyUtf8Memory) return readOnlyUtf8Memory;
             if (value is Utf8Memory utf8Memory) return utf8Memory.AsReadOnly();
-            if (value is string str) return new ReadOnlyUtf8Memory(Parse(str.AsSpan()));
-            if (value is char[] chars) return new ReadOnlyUtf8Memory(Parse(chars));
-            if (value is Memory<char> memoryChar) return new ReadOnlyUtf8Memory(Parse(memoryChar.Span));
-            if (value is ReadOnlyMemory<char> readOnlyMemoryChar) return new ReadOnlyUtf8Memory(Parse(readOnlyMemoryChar.Span));
+            if (value is string str) return Parse(str.AsSpan());
+            if (value is char[] chars) return Parse(chars);
+            if (value is Memory<char> memoryChar) return Parse(memoryChar.Span);
+            if (value is ReadOnlyMemory<char> readOnlyMemoryChar) return Parse(readOnlyMemoryChar.Span);
             if (value is byte[] bytes) return new ReadOnlyUtf8Memory(bytes);
             if (value is Memory<byte> memoryByte) return new ReadOnlyUtf8Memory(memoryByte);
             if (value is ReadOnlyMemory<byte> readOnlyMemoryByte) return new ReadOnlyUtf8Memory(readOnlyMemoryByte.ToArray());
@@ -60,7 +60,7 @@ public readonly struct ReadOnlyUtf8Memory : IComparable<ReadOnlyUtf8Memory>, IEq
             if (tokenType == JsonTokenType.Null) return default;
             if (tokenType != JsonTokenType.String) throw new JsonException("Expected string");
 
-            var length = reader.HasValueSequence ? reader.ValueSequence.Length : reader.ValueSpan.Length;
+            int length = reader.GetLength();
             if (length == 0) return default;
 
             var bytes = new byte[length];
@@ -271,6 +271,9 @@ public readonly struct ReadOnlyUtf8Memory : IComparable<ReadOnlyUtf8Memory>, IEq
         utf8Memory = new(bytes);
         return true;
     }
+
+    public static ReadOnlyUtf8Memory Parse(string str)
+        => str == null || str.Length == 0 ? default : new(Encoding.UTF8.GetBytes(str));
 
     #endregion Parse
 

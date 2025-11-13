@@ -52,26 +52,15 @@ public readonly struct Utf8String : IComparable<Utf8String>, IEquatable<Utf8Stri
             if (tokenType == JsonTokenType.Null) return default;
             if (tokenType != JsonTokenType.String) throw new JsonException("Expected string");
 
-            int length;
-            if (reader.HasValueSequence)
-            {
-                var longLength = reader.ValueSequence.Length;
-                if (longLength == 0) return default;
-                if (longLength > GB) throw new JsonException("string too long");
-                length = checked((int)longLength);
-            }
-            else
-            {
-                length = reader.ValueSpan.Length;
-                if (length > GB) throw new JsonException("string too long");
-            }
-            
             if (reader.ValueIsEscaped)
             {
+                int length = reader.GetLength(GB);
+                if (length == 0) return default;
+
                 var rented = ArrayPool<byte>.Shared.Rent(length);
-                var span = rented.AsSpan();
                 try
                 {
+                    var span = rented.AsSpan();
                     var written = reader.CopyString(span);
                     return new(span.Slice(0, written).ToArray());
                 }
@@ -82,6 +71,9 @@ public readonly struct Utf8String : IComparable<Utf8String>, IEquatable<Utf8Stri
             }
             else
             {
+                int length = reader.GetLength();
+                if (length == 0) return default;
+
                 var bytes = new byte[length];
 
                 var written = reader.CopyString(bytes);

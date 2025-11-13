@@ -60,7 +60,7 @@ public readonly struct Utf8Memory : IComparable<Utf8Memory>, IEquatable<Utf8Memo
             if (tokenType == JsonTokenType.Null) return default;
             if (tokenType != JsonTokenType.String) throw new JsonException("Expected string");
 
-            var length = reader.HasValueSequence ? reader.ValueSequence.Length : reader.ValueSpan.Length;
+            int length = reader.GetLength();
             if (length == 0) return default;
 
             var bytes = new byte[length];

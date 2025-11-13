@@ -56,6 +56,9 @@ public class JsonTest
         Assert.That(JsonSerializer.Deserialize<string>("\"\""),
             Is.EqualTo(string.Empty));
 
+        Assert.That(JsonSerializer.Serialize((Utf8String)default),
+            Is.EqualTo("null"));
+
         Assert.That(JsonSerializer.Serialize(Utf8String.Empty),
             Is.EqualTo("\"\""));
 

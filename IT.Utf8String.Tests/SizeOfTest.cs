@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Tests;
 
-internal class SizeOfTest
+public class SizeOfTest
 {
     [Test]
     public void Test()

@@ -85,7 +85,16 @@ public readonly struct Utf8String : IComparable<Utf8String>, IEquatable<Utf8Stri
         }
 
         public override void Write(Utf8JsonWriter writer, Utf8String value, JsonSerializerOptions options)
-            => writer.WriteStringValue(value);
+        {
+            if (value._value == null)
+            {
+                writer.WriteNullValue();
+            }
+            else
+            {
+                writer.WriteStringValue(value);
+            }
+        }
     }
 
     private readonly byte[]? _value;

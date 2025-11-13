@@ -19,6 +19,9 @@ public class JsonTest
         Assert.That(JsonSerializer.Serialize("my utf8 str"),
             Is.EqualTo("\"my utf8 str\""));
 
+        Assert.That(JsonSerializer.Serialize(new Utf8String("my utf8 str"u8.ToArray())),
+            Is.EqualTo("\"my utf8 str\""));
+
         Assert.That(JsonSerializer.Serialize(new Utf8Memory("my utf8 str"u8.ToArray())),
             Is.EqualTo("\"my utf8 str\""));
 
@@ -27,6 +30,9 @@ public class JsonTest
 
         Assert.That(JsonSerializer.Deserialize<string>("\"my utf8 str\""),
             Is.EqualTo("my utf8 str"));
+
+        Assert.That(JsonSerializer.Deserialize<Utf8String>("\"my utf8 str\""),
+            Is.EqualTo(new Utf8String("my utf8 str"u8.ToArray())));
 
         Assert.That(JsonSerializer.Deserialize<Utf8Memory>("\"my utf8 str\""),
             Is.EqualTo(new Utf8Memory("my utf8 str"u8.ToArray())));
@@ -50,8 +56,16 @@ public class JsonTest
         Assert.That(JsonSerializer.Deserialize<string>("\"\""),
             Is.EqualTo(string.Empty));
 
+        Assert.That(JsonSerializer.Serialize(Utf8String.Empty),
+            Is.EqualTo("\"\""));
+
         Assert.That(JsonSerializer.Serialize(Utf8Memory.Empty),
             Is.EqualTo("\"\""));
+
+        var utf8 = JsonSerializer.Deserialize<Utf8String>("\"\"");
+        Assert.That(utf8.Array != null && utf8.Array.Length == 0, Is.True);
+
+        Assert.That(JsonSerializer.Deserialize<Utf8String>("null").Array == null, Is.True);
 
         Assert.That(JsonSerializer.Deserialize<Utf8Memory>("\"\""),
             Is.EqualTo(Utf8Memory.Empty));
@@ -75,6 +89,9 @@ public class JsonTest
         Assert.That(JsonSerializer.Serialize("my \"utf8\" str"),
             Is.EqualTo("\"my \\u0022utf8\\u0022 str\""));
 
+        Assert.That(JsonSerializer.Serialize(new Utf8String("my \"utf8\" str"u8.ToArray())),
+            Is.EqualTo("\"my \\u0022utf8\\u0022 str\""));
+
         Assert.That(JsonSerializer.Serialize(new Utf8Memory("my \"utf8\" str"u8.ToArray())),
             Is.EqualTo("\"my \\u0022utf8\\u0022 str\""));
 
@@ -84,6 +101,9 @@ public class JsonTest
         Assert.That(JsonSerializer.Deserialize<string>("\"my \\u0022utf8\\u0022 str\""),
             Is.EqualTo("my \"utf8\" str"));
 
+        Assert.That(JsonSerializer.Deserialize<Utf8String>("\"my \\u0022utf8\\u0022 str\""),
+            Is.EqualTo(new Utf8String("my \"utf8\" str"u8.ToArray())));
+
         Assert.That(JsonSerializer.Deserialize<Utf8Memory>("\"my \\u0022utf8\\u0022 str\""),
             Is.EqualTo(new Utf8Memory("my \"utf8\" str"u8.ToArray())));
 
@@ -92,6 +112,9 @@ public class JsonTest
 
         Assert.That(JsonSerializer.Deserialize<string>("\"my \\\"utf8\\\" str\""),
             Is.EqualTo("my \"utf8\" str"));
+
+        Assert.That(JsonSerializer.Deserialize<Utf8String>("\"my \\\"utf8\\\" str\""),
+            Is.EqualTo(new Utf8String("my \"utf8\" str"u8.ToArray())));
 
         Assert.That(JsonSerializer.Deserialize<Utf8Memory>("\"my \\\"utf8\\\" str\""),
             Is.EqualTo(new Utf8Memory("my \"utf8\" str"u8.ToArray())));
@@ -107,7 +130,10 @@ public class JsonTest
         Assert.That(JsonSerializer.Serialize("my \"utf8\" str", jso), 
             Is.EqualTo("\"my \\\"utf8\\\" str\""));
 
-        Assert.That(JsonSerializer.Serialize(new Utf8Memory("my \"utf8\" str"u8.ToArray()), jso), 
+        Assert.That(JsonSerializer.Serialize(new Utf8Memory("my \"utf8\" str"u8.ToArray()), jso),
+            Is.EqualTo("\"my \\\"utf8\\\" str\""));
+
+        Assert.That(JsonSerializer.Serialize(new Utf8String("my \"utf8\" str"u8.ToArray()), jso), 
             Is.EqualTo("\"my \\\"utf8\\\" str\""));
 
         Assert.That(JsonSerializer.Serialize(new ReadOnlyUtf8Memory("my \"utf8\" str"u8.ToArray()), jso),

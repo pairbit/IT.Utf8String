@@ -55,7 +55,7 @@ public readonly struct Utf8String : IComparable<Utf8String>, IEquatable<Utf8Stri
             if (reader.ValueIsEscaped)
             {
                 int length = reader.GetLength(GB);
-                if (length == 0) return default;
+                if (length == 0) return Empty;
 
                 var rented = ArrayPool<byte>.Shared.Rent(length);
                 try
@@ -72,7 +72,7 @@ public readonly struct Utf8String : IComparable<Utf8String>, IEquatable<Utf8Stri
             else
             {
                 int length = reader.GetLength();
-                if (length == 0) return default;
+                if (length == 0) return Empty;
 
                 var bytes = new byte[length];
 
@@ -90,7 +90,9 @@ public readonly struct Utf8String : IComparable<Utf8String>, IEquatable<Utf8Stri
 
     private readonly byte[]? _value;
 
-    public static Utf8String Empty => default;
+    public static Utf8String Empty => new([]);
+
+    public byte[]? Array => _value;
 
     public Memory<byte> Memory => _value;
 

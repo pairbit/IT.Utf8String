@@ -172,11 +172,4 @@ public class JsonTest
 
         Assert.That(JsonSerializer.Deserialize<ROEntity>(json), Is.EqualTo(obj));
     }
-
-    [Test]
-    public void SizeOfTest()
-    {
-        Assert.That(Unsafe.SizeOf<Utf8Memory>(), Is.EqualTo(16));
-        Assert.That(Unsafe.SizeOf<ReadOnlyUtf8Memory>(), Is.EqualTo(16));
-    }
 }

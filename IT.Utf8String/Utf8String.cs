@@ -100,7 +100,7 @@ public readonly struct Utf8String : IComparable<Utf8String>, IEquatable<Utf8Stri
 
     public bool IsEmpty => _value == null || _value.Length == 0;
 
-    public Utf8String(byte[] value)
+    public Utf8String(byte[]? value)
     {
         _value = value;
     }

@@ -25,6 +25,19 @@ internal class ComparableTest
     [Test]
     public void SortTest()
     {
+        Utf8String str1 = default;
+        Utf8String str2 = new([]);
+        Utf8String str3 = new(null);
+
+        Assert.That(str1 == str2, Is.True);
+        Assert.That(str1 == str3, Is.True);
+
+        var array = new Utf8String[] {
+            "str3"u8.ToArray(),
+            "str1"u8.ToArray(),
+            "str2"u8.ToArray()
+        };
+
         var array1 = new Utf8Memory[] {
             "str3"u8.ToArray(),
             "str1"u8.ToArray(),
@@ -36,14 +49,18 @@ internal class ComparableTest
             "str1"u8.ToArray()
         };
 
+        Array.Sort(array);
         Array.Sort(array1);
         Array.Sort(array2);
 
         Assert.That(array1.Length, Is.EqualTo(array2.Length));
+        Assert.That(array.Length, Is.EqualTo(array2.Length));
 
-        for (int i = 0; i < array1.Length; i++)
+        for (int i = 0; i < array.Length; i++)
         {
-            Assert.That(array1[i].AsReadOnly(), Is.EqualTo(array2[i]));
+            var str = array[i];
+            Assert.That(str.AsReadOnly(), Is.EqualTo(array1[i].AsReadOnly()));
+            Assert.That(str.AsReadOnly(), Is.EqualTo(array2[i]));
         }
     }
 

@@ -40,10 +40,10 @@ public readonly struct ReadOnlyUtf8Memory : IComparable<ReadOnlyUtf8Memory>, IEq
         {
             if (value is ReadOnlyUtf8Memory readOnlyUtf8Memory) return readOnlyUtf8Memory;
             if (value is Utf8Memory utf8Memory) return utf8Memory.AsReadOnly();
-            if (value is string str) return new ReadOnlyUtf8Memory(Parse(str.AsSpan()));
-            if (value is char[] chars) return new ReadOnlyUtf8Memory(Parse(chars));
-            if (value is Memory<char> memoryChar) return new ReadOnlyUtf8Memory(Parse(memoryChar.Span));
-            if (value is ReadOnlyMemory<char> readOnlyMemoryChar) return new ReadOnlyUtf8Memory(Parse(readOnlyMemoryChar.Span));
+            if (value is string str) return Parse(str.AsSpan());
+            if (value is char[] chars) return Parse(chars);
+            if (value is Memory<char> memoryChar) return Parse(memoryChar.Span);
+            if (value is ReadOnlyMemory<char> readOnlyMemoryChar) return Parse(readOnlyMemoryChar.Span);
             if (value is byte[] bytes) return new ReadOnlyUtf8Memory(bytes);
             if (value is Memory<byte> memoryByte) return new ReadOnlyUtf8Memory(memoryByte);
             if (value is ReadOnlyMemory<byte> readOnlyMemoryByte) return new ReadOnlyUtf8Memory(readOnlyMemoryByte.ToArray());

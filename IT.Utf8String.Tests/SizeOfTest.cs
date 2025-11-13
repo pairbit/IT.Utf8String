@@ -11,5 +11,6 @@ public class SizeOfTest
         Assert.That(Unsafe.SizeOf<Utf8String>(), Is.EqualTo(8));
         Assert.That(Unsafe.SizeOf<Utf8Memory>(), Is.EqualTo(16));
         Assert.That(Unsafe.SizeOf<ReadOnlyUtf8Memory>(), Is.EqualTo(16));
+        Assert.That(Unsafe.SizeOf<UtfString>(), Is.EqualTo(16));
     }
 }

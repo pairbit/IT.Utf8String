@@ -296,6 +296,14 @@ public readonly struct Utf8String : IComparable<Utf8String>, IEquatable<Utf8Stri
         return true;
     }
 
+    public static Utf8String Parse(string str)
+    {
+        if (str == null) return default;
+        if (str.Length == 0) return Empty;
+
+        return new(Encoding.UTF8.GetBytes(str));
+    }
+
     #endregion Parse
 
     #region Parsable
@@ -313,7 +321,7 @@ public readonly struct Utf8String : IComparable<Utf8String>, IEquatable<Utf8Stri
 #if NET7_0_OR_GREATER
 
     static Utf8String ISpanParsable<Utf8String>.Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
-        => Parse(s);
+    => Parse(s);
 
     static bool ISpanParsable<Utf8String>.TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out Utf8String result)
         => TryParse(s, out result);

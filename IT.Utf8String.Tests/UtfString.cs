@@ -19,13 +19,13 @@ internal readonly struct UtfString
     public UtfString(string utf16)
     {
         _utf16 = utf16 ?? throw new ArgumentNullException(nameof(utf16));
-        _utf8 = utf16.Length == 0 ? [] : Encoding.UTF8.GetBytes(utf16);
+        _utf8 = Utf8String.Parse(utf16);
     }
 
-    public UtfString(ReadOnlySpan<byte> utf8)
+    public UtfString(Utf8String utf8)
     {
-        _utf16 = utf8.Length == 0 ? string.Empty : Encoding.UTF8.GetString(utf8);
-        _utf8 = utf8.ToArray();
+        _utf8 = utf8;
+        _utf16 = utf8.ToString();
     }
 
     public override string ToString() => Utf16;

@@ -272,6 +272,9 @@ public readonly struct ReadOnlyUtf8Memory : IComparable<ReadOnlyUtf8Memory>, IEq
         return true;
     }
 
+    public static ReadOnlyUtf8Memory Parse(string str)
+        => str == null || str.Length == 0 ? default : new(Encoding.UTF8.GetBytes(str));
+
     #endregion Parse
 
     #region Parsable

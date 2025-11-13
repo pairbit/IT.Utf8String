@@ -1,5 +1,4 @@
 ﻿using IT;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace Tests;
@@ -130,13 +129,13 @@ public class JsonTest
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         };
 
-        Assert.That(JsonSerializer.Serialize("my \"utf8\" str", jso), 
+        Assert.That(JsonSerializer.Serialize("my \"utf8\" str", jso),
             Is.EqualTo("\"my \\\"utf8\\\" str\""));
 
         Assert.That(JsonSerializer.Serialize(new Utf8Memory("my \"utf8\" str"u8.ToArray()), jso),
             Is.EqualTo("\"my \\\"utf8\\\" str\""));
 
-        Assert.That(JsonSerializer.Serialize(new Utf8String("my \"utf8\" str"u8.ToArray()), jso), 
+        Assert.That(JsonSerializer.Serialize(new Utf8String("my \"utf8\" str"u8.ToArray()), jso),
             Is.EqualTo("\"my \\\"utf8\\\" str\""));
 
         Assert.That(JsonSerializer.Serialize(new ReadOnlyUtf8Memory("my \"utf8\" str"u8.ToArray()), jso),

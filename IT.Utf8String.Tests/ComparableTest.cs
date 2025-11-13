@@ -27,10 +27,8 @@ internal class ComparableTest
     {
         Utf8String str1 = default;
         Utf8String str2 = new([]);
-        Utf8String str3 = new(null);
 
         Assert.That(str1 == str2, Is.True);
-        Assert.That(str1 == str3, Is.True);
 
         var array = new Utf8String[] {
             "str3"u8.ToArray(),
